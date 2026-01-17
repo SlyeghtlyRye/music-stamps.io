@@ -1,2 +1,2 @@
-# music-stamp.io
+# music-stamps.io
 Music Stamps
