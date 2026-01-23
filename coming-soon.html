@@ -33,6 +33,149 @@
             transform: translateY(calc(50vh + 400px));
         }
 
+        /* Add Song Button */
+        .add-song-btn {
+            position: absolute;
+            top: -80px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 60px;
+            background: #ff0000;
+            border: 3px solid #000;
+            border-radius: 50%;
+            font-size: 36px;
+            color: #fff;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.3s;
+            z-index: 100;
+        }
+
+        .scene.projects-view .add-song-btn {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .add-song-btn:hover {
+            background: #cc0000;
+            transform: translateX(-50%) scale(1.1);
+        }
+
+        /* Login Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: #fff;
+            border: 3px solid #000;
+            padding: 40px;
+            max-width: 400px;
+            width: 90%;
+            position: relative;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 24px;
+            cursor: pointer;
+            color: #666;
+        }
+
+        .modal-close:hover {
+            color: #000;
+        }
+
+        .modal h2 {
+            margin-bottom: 20px;
+            font-size: 24px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #000;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #ff0000;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 12px;
+            background: #ff0000;
+            color: #fff;
+            border: 2px solid #000;
+            font-family: 'Courier New', monospace;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .submit-btn:hover {
+            background: #cc0000;
+        }
+
+        .submit-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .error-message {
+            color: #ff0000;
+            font-size: 12px;
+            margin-top: 10px;
+            display: none;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        /* Upload Form */
+        .upload-form {
+            display: none;
+        }
+
+        .upload-form.active {
+            display: block;
+        }
+
         /* Chip Selection Area */
         .chip-shelf {
             height: 400px;
@@ -304,14 +447,6 @@
             margin-bottom: 10px;
         }
 
-        .back-instruction {
-            margin-top: 20px;
-            padding: 15px;
-            background: #ffe5e5;
-            border: 2px solid #ff0000;
-            font-size: 14px;
-        }
-
         .welcome-message {
             position: absolute;
             bottom: 20px;
@@ -358,6 +493,7 @@
         <div class="scene" id="scene">
             <!-- Chip Selection Area (Above) -->
             <div class="chip-shelf">
+                <button class="add-song-btn" onclick="handleAddSong()">+</button>
                 <div class="music-chip" onclick="loadChip('Song A', this)">
                     <div>♪</div>
                     <div class="chip-label">SONG A</div>
@@ -403,16 +539,173 @@
         </div>
     </div>
 
+    <!-- Login Modal -->
+    <div class="modal" id="loginModal">
+        <div class="modal-content">
+            <span class="modal-close" onclick="closeModal()">&times;</span>
+            <h2>Admin Login</h2>
+            <form id="loginForm" onsubmit="handleLogin(event)">
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" name="username" required autocomplete="username">
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" required autocomplete="current-password">
+                </div>
+                <button type="submit" class="submit-btn" id="loginBtn">Login</button>
+                <div class="error-message" id="loginError"></div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Upload Modal -->
+    <div class="modal" id="uploadModal">
+        <div class="modal-content">
+            <span class="modal-close" onclick="closeUploadModal()">&times;</span>
+            <h2>Add New Song</h2>
+            <div class="upload-form active">
+                <div class="form-group">
+                    <label for="songName">Song Name</label>
+                    <input type="text" id="songName" name="songName" required>
+                </div>
+                <div class="form-group">
+                    <label for="artistName">Artist Name</label>
+                    <input type="text" id="artistName" name="artistName" required>
+                </div>
+                <div class="form-group">
+                    <label for="albumName">Album Name</label>
+                    <input type="text" id="albumName" name="albumName" required>
+                </div>
+                <div class="form-group">
+                    <label for="songFile">Audio File (Coming Soon)</label>
+                    <input type="file" id="songFile" name="songFile" accept="audio/*" disabled>
+                </div>
+                <button type="button" class="submit-btn" onclick="handleUpload()">Upload Song (Demo)</button>
+            </div>
+        </div>
+    </div>
+
     <script>
+        // Configuration - Replace with your Cloudflare Worker URL
+        const AUTH_API_URL = 'https://music-stamps-auth.rybutler1000.workers.dev/';
+        
         const scene = document.getElementById('scene');
         const content = document.getElementById('content');
         const chipSlot = document.getElementById('chipSlot');
         const backArrow = document.getElementById('backArrow');
         const welcomeMessage = document.getElementById('welcomeMessage');
+        const loginModal = document.getElementById('loginModal');
+        const uploadModal = document.getElementById('uploadModal');
+        
         let currentChip = null;
         let hasClickedTab = false;
         let isPlaying = false;
         let tipTimeout = null;
+        let authToken = null;
+
+        // Check for existing session on page load
+        window.addEventListener('load', checkAuth);
+
+        async function checkAuth() {
+            const token = localStorage.getItem('authToken');
+            if (token) {
+                try {
+                    const response = await fetch(`${AUTH_API_URL}/auth/verify`, {
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        }
+                    });
+                    
+                    if (response.ok) {
+                        const data = await response.json();
+                        if (data.valid) {
+                            authToken = token;
+                            console.log('Authenticated as:', data.username);
+                            return;
+                        }
+                    }
+                } catch (error) {
+                    console.error('Auth check failed:', error);
+                }
+                
+                // Invalid token, clear it
+                localStorage.removeItem('authToken');
+                authToken = null;
+            }
+        }
+
+        async function handleAddSong() {
+            if (!authToken) {
+                loginModal.classList.add('active');
+            } else {
+                uploadModal.classList.add('active');
+            }
+        }
+
+        async function handleLogin(event) {
+            event.preventDefault();
+            
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const loginBtn = document.getElementById('loginBtn');
+            const errorMsg = document.getElementById('loginError');
+            
+            loginBtn.disabled = true;
+            loginBtn.textContent = 'Logging in...';
+            errorMsg.classList.remove('show');
+            
+            try {
+                const response = await fetch(`${AUTH_API_URL}/auth/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ username, password })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    authToken = data.token;
+                    localStorage.setItem('authToken', data.token);
+                    closeModal();
+                    uploadModal.classList.add('active');
+                } else {
+                    errorMsg.textContent = data.error || 'Login failed';
+                    errorMsg.classList.add('show');
+                }
+            } catch (error) {
+                errorMsg.textContent = 'Connection error. Please try again.';
+                errorMsg.classList.add('show');
+            } finally {
+                loginBtn.disabled = false;
+                loginBtn.textContent = 'Login';
+            }
+        }
+
+        function closeModal() {
+            loginModal.classList.remove('active');
+            document.getElementById('loginForm').reset();
+            document.getElementById('loginError').classList.remove('show');
+        }
+
+        function closeUploadModal() {
+            uploadModal.classList.remove('active');
+        }
+
+        function handleUpload() {
+            const songName = document.getElementById('songName').value;
+            const artistName = document.getElementById('artistName').value;
+            const albumName = document.getElementById('albumName').value;
+            
+            if (songName && artistName && albumName) {
+                alert(`Song upload demo:\nSong: ${songName}\nArtist: ${artistName}\nAlbum: ${albumName}\n\nFile upload will be implemented next!`);
+                closeUploadModal();
+            } else {
+                alert('Please fill in all fields');
+            }
+        }
 
         // Add click handler to welcome message
         welcomeMessage.addEventListener('click', function(e) {
@@ -430,7 +723,6 @@
         };
 
         function switchTab(i) {
-            // Convert to info button after first click
             if (!hasClickedTab) {
                 hasClickedTab = true;
                 welcomeMessage.classList.add('lightbulb');
@@ -442,14 +734,12 @@
             });
             content.innerHTML = pages[i];
 
-            // Show chip slot only on Projects tab
             if (i === 1) {
                 chipSlot.classList.add('visible');
             } else {
                 chipSlot.classList.remove('visible');
             }
 
-            // Move camera for projects view
             if (i === 1) {
                 scene.classList.add('projects-view');
                 backArrow.classList.add('visible');
@@ -460,11 +750,9 @@
         }
 
         function panToProjects() {
-            // Pan camera down to Projects page
             scene.classList.remove('projects-view');
             backArrow.classList.remove('visible');
             
-            // Update active tab to Projects
             document.querySelectorAll('.tab').forEach((t, idx) => {
                 t.classList.toggle('active', idx === 1);
             });
@@ -473,22 +761,18 @@
         }
 
         function showInfoTip() {
-            // Clear any existing timeout
             if (tipTimeout) {
                 clearTimeout(tipTimeout);
             }
 
-            // Fade out
             welcomeMessage.style.opacity = '0';
 
-            // After fade out, change content and fade in
             setTimeout(() => {
                 welcomeMessage.classList.add('showing-tip');
                 welcomeMessage.innerHTML = 'Click a tab above to navigate. Select PROJECTS to browse available music chips.';
                 welcomeMessage.style.opacity = '1';
             }, 500);
 
-            // Fade back to 'i' after 10 seconds
             tipTimeout = setTimeout(() => {
                 welcomeMessage.style.opacity = '0';
                 setTimeout(() => {
@@ -499,17 +783,9 @@
             }, 10000);
         }
 
-        function showWelcomeTip() {
-            if (hasClickedTab) {
-                alert('Welcome! Click a tab above to navigate.\nSelect PROJECTS to browse available music chips.');
-            }
-        }
-
         function loadChip(name, chipElement) {
-            // Animate chip dropping
             chipElement.classList.add('dropping');
 
-            // After drop animation completes, load chip and pan down
             setTimeout(() => {
                 currentChip = name;
                 isPlaying = false;
@@ -527,17 +803,14 @@
                     </div>
                 `;
                 
-                // Pan camera down to Projects page
                 scene.classList.remove('projects-view');
                 backArrow.classList.remove('visible');
                 
-                // Update active tab
                 document.querySelectorAll('.tab').forEach((t, idx) => {
                     t.classList.toggle('active', idx === 1);
                 });
                 content.innerHTML = pages[1];
                 
-                // Reset chip after brief delay
                 setTimeout(() => {
                     chipElement.classList.remove('dropping');
                 }, 100);
@@ -550,20 +823,11 @@
             if (isPlaying) {
                 btn.textContent = 'PAUSE';
                 btn.classList.add('pause');
-                // Here you would start audio playback
                 console.log(`Playing: ${currentChip}`);
             } else {
                 btn.textContent = 'PLAY';
                 btn.classList.remove('pause');
-                // Here you would pause audio playback
                 console.log(`Paused: ${currentChip}`);
-            }
-        }
-
-        function playChip() {
-            if (currentChip) {
-                alert(`Now playing: ${currentChip}`);
-                // Here you would integrate actual audio playback
             }
         }
     </script>
