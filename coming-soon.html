@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cassette Player</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Courier New', monospace;
+            background: #f0f0f0;
+            overflow-x: hidden;
+        }
+
+        .viewport {
+            height: 100vh;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .scene {
+            transition: transform 0.8s ease;
+            position: relative;
+            transform: translateY(200px);
+        }
+
+        .scene.projects-view {
+            transform: translateY(calc(50vh + 400px));
+        }
+
+        /* Chip Selection Area */
+        .chip-shelf {
+            height: 400px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            padding: 40px;
+            flex-wrap: wrap;
+            margin-top: -600px;
+            position: relative;
+            transition: opacity 0.5s ease;
+            opacity: 0;
+        }
+
+        .scene.projects-view .chip-shelf {
+            opacity: 1;
+        }
+
+        .back-arrow {
+            position: fixed;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 48px;
+            color: #000;
+            cursor: pointer;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+            animation: bounce 2s infinite;
+            z-index: 1000;
+        }
+
+        .back-arrow.visible {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        @keyframes bounce {
+            0%, 100% {
+                transform: translateX(-50%) translateY(0);
+            }
+            50% {
+                transform: translateX(-50%) translateY(10px);
+            }
+        }
+
+        .music-chip {
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(135deg, #333, #555);
+            border: 3px solid #000;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+            color: #fff;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .music-chip:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+
+        .music-chip.dropping {
+            animation: dropChip 1s ease forwards;
+        }
+
+        @keyframes dropChip {
+            0% {
+                transform: translateY(0);
+            }
+            100% {
+                transform: translateY(calc(50vh + 400px));
+                opacity: 0;
+            }
+        }
+
+        .chip-label {
+            margin-top: 8px;
+            text-align: center;
+            font-size: 10px;
+        }
+
+        /* Player Area */
+        .player-area {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            width: 100%;
+        }
+
+        .tabs-row {
+            display: flex;
+            gap: 0;
+            margin-bottom: -1px;
+        }
+
+        .tab {
+            background: #fff;
+            border: 3px solid #000;
+            border-bottom: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            color: #000;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .tab:hover {
+            background: #f5f5f5;
+        }
+
+        .tab.active {
+            background: #ff0000;
+            color: #fff;
+            transform: translateY(-5px);
+        }
+
+        .content-box {
+            background: #fff;
+            border: 3px solid #000;
+            padding: 40px;
+            min-height: 400px;
+            position: relative;
+        }
+
+        .container {
+            transition: opacity 0.5s ease;
+        }
+
+        .scene.projects-view .container {
+            opacity: 0;
+        }
+
+        /* Chip Slot */
+        .chip-slot {
+            position: absolute;
+            top: 70%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 300px;
+            height: 200px;
+            border: 3px dashed #ccc;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            color: #999;
+            text-align: center;
+            transition: opacity 0.3s;
+            background: #fff;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .chip-slot.visible {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .tab.active:nth-child(2) ~ .content-box .chip-slot {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .scene.projects-view .chip-slot {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .chip-slot.has-chip {
+            border-color: #000;
+            border-style: solid;
+        }
+
+        .loaded-chip {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .chip-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #333, #555);
+            border: 2px solid #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .track-info {
+            text-align: center;
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .track-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .track-details {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .player-controls {
+            display: flex;
+            gap: 10px;
+        }
+
+        .control-btn {
+            padding: 10px 20px;
+            background: #ff0000;
+            color: #fff;
+            border: 2px solid #000;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            transition: all 0.2s;
+        }
+
+        .control-btn:hover {
+            background: #cc0000;
+            transform: scale(1.05);
+        }
+
+        .control-btn.pause {
+            background: #555;
+        }
+
+        .control-btn.pause:hover {
+            background: #333;
+        }
+
+        .content h2 {
+            margin-bottom: 15px;
+            font-size: 24px;
+        }
+
+        .content p {
+            line-height: 1.6;
+            margin-bottom: 10px;
+        }
+
+        .back-instruction {
+            margin-top: 20px;
+            padding: 15px;
+            background: #ffe5e5;
+            border: 2px solid #ff0000;
+            font-size: 14px;
+        }
+
+        .welcome-message {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            text-align: left;
+            font-size: 14px;
+            color: #333;
+            transition: opacity 0.5s ease;
+            white-space: nowrap;
+        }
+
+        .welcome-message.lightbulb {
+            font-size: 24px;
+            cursor: pointer;
+            font-weight: bold;
+            color: #000;
+            user-select: none;
+            z-index: 9999;
+        }
+
+        .welcome-message.lightbulb:hover {
+            color: #ff0000;
+        }
+
+        .welcome-message.showing-tip {
+            font-size: 14px;
+            cursor: default;
+            white-space: normal;
+        }
+
+        .welcome-message.showing-tip:hover {
+            color: #333;
+        }
+
+        .scene.projects-view .welcome-message {
+            opacity: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="viewport">
+        <div class="back-arrow" id="backArrow" onclick="panToProjects()">↓</div>
+        <div class="scene" id="scene">
+            <!-- Chip Selection Area (Above) -->
+            <div class="chip-shelf">
+                <div class="music-chip" onclick="loadChip('Song A', this)">
+                    <div>♪</div>
+                    <div class="chip-label">SONG A</div>
+                </div>
+                <div class="music-chip" onclick="loadChip('Song B', this)">
+                    <div>♫</div>
+                    <div class="chip-label">SONG B</div>
+                </div>
+                <div class="music-chip" onclick="loadChip('Song C', this)">
+                    <div>♪</div>
+                    <div class="chip-label">SONG C</div>
+                </div>
+                <div class="music-chip" onclick="loadChip('Song D', this)">
+                    <div>♫</div>
+                    <div class="chip-label">SONG D</div>
+                </div>
+            </div>
+
+            <!-- Player Area (Below) -->
+            <div class="player-area">
+                <div class="container">
+                    <div class="tabs-row">
+                        <button class="tab active" onclick="switchTab(0)">HOME</button>
+                        <button class="tab" onclick="switchTab(1)">PROJECTS</button>
+                        <button class="tab" onclick="switchTab(2)">ABOUT</button>
+                        <button class="tab" onclick="switchTab(3)">CONTACT</button>
+                    </div>
+
+                    <div class="content-box">
+                        <div class="content" id="content">
+                        </div>
+                    </div>
+
+                    <div class="chip-slot" id="chipSlot">
+                        INSERT<br>CHIP
+                    </div>
+                </div>
+
+                <div class="welcome-message" id="welcomeMessage">
+                    Welcome! Click a tab above to navigate.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const scene = document.getElementById('scene');
+        const content = document.getElementById('content');
+        const chipSlot = document.getElementById('chipSlot');
+        const backArrow = document.getElementById('backArrow');
+        const welcomeMessage = document.getElementById('welcomeMessage');
+        let currentChip = null;
+        let hasClickedTab = false;
+        let isPlaying = false;
+        let tipTimeout = null;
+
+        // Add click handler to welcome message
+        welcomeMessage.addEventListener('click', function(e) {
+            e.stopPropagation();
+            if (hasClickedTab) {
+                showInfoTip();
+            }
+        }, true);
+
+        const pages = {
+            0: '',
+            1: '',
+            2: '<h2>About</h2><p>Developer and creator.</p><p style="margin-top: 20px;"><a href="index.html" style="color: #666; text-decoration: none; cursor: default; font-size: 14px;">-Go back to Title</a></p>',
+            3: '<h2>Contact</h2><p>Get in touch.</p>'
+        };
+
+        function switchTab(i) {
+            // Convert to info button after first click
+            if (!hasClickedTab) {
+                hasClickedTab = true;
+                welcomeMessage.classList.add('lightbulb');
+                welcomeMessage.innerHTML = 'i';
+            }
+
+            document.querySelectorAll('.tab').forEach((t, idx) => {
+                t.classList.toggle('active', idx === i);
+            });
+            content.innerHTML = pages[i];
+
+            // Show chip slot only on Projects tab
+            if (i === 1) {
+                chipSlot.classList.add('visible');
+            } else {
+                chipSlot.classList.remove('visible');
+            }
+
+            // Move camera for projects view
+            if (i === 1) {
+                scene.classList.add('projects-view');
+                backArrow.classList.add('visible');
+            } else {
+                scene.classList.remove('projects-view');
+                backArrow.classList.remove('visible');
+            }
+        }
+
+        function panToProjects() {
+            // Pan camera down to Projects page
+            scene.classList.remove('projects-view');
+            backArrow.classList.remove('visible');
+            
+            // Update active tab to Projects
+            document.querySelectorAll('.tab').forEach((t, idx) => {
+                t.classList.toggle('active', idx === 1);
+            });
+            content.innerHTML = pages[1];
+            chipSlot.classList.add('visible');
+        }
+
+        function showInfoTip() {
+            // Clear any existing timeout
+            if (tipTimeout) {
+                clearTimeout(tipTimeout);
+            }
+
+            // Fade out
+            welcomeMessage.style.opacity = '0';
+
+            // After fade out, change content and fade in
+            setTimeout(() => {
+                welcomeMessage.classList.add('showing-tip');
+                welcomeMessage.innerHTML = 'Click a tab above to navigate. Select PROJECTS to browse available music chips.';
+                welcomeMessage.style.opacity = '1';
+            }, 500);
+
+            // Fade back to 'i' after 10 seconds
+            tipTimeout = setTimeout(() => {
+                welcomeMessage.style.opacity = '0';
+                setTimeout(() => {
+                    welcomeMessage.classList.remove('showing-tip');
+                    welcomeMessage.innerHTML = 'i';
+                    welcomeMessage.style.opacity = '1';
+                }, 500);
+            }, 10000);
+        }
+
+        function showWelcomeTip() {
+            if (hasClickedTab) {
+                alert('Welcome! Click a tab above to navigate.\nSelect PROJECTS to browse available music chips.');
+            }
+        }
+
+        function loadChip(name, chipElement) {
+            // Animate chip dropping
+            chipElement.classList.add('dropping');
+
+            // After drop animation completes, load chip and pan down
+            setTimeout(() => {
+                currentChip = name;
+                isPlaying = false;
+                chipSlot.classList.add('has-chip');
+                chipSlot.innerHTML = `
+                    <div class="loaded-chip">
+                        <div class="chip-icon">♪</div>
+                        <div class="track-info">
+                            <div class="track-title">${name}</div>
+                            <div class="track-details">Artist Name • Album Title</div>
+                        </div>
+                        <div class="player-controls">
+                            <button class="control-btn" onclick="playPause()">PLAY</button>
+                        </div>
+                    </div>
+                `;
+                
+                // Pan camera down to Projects page
+                scene.classList.remove('projects-view');
+                backArrow.classList.remove('visible');
+                
+                // Update active tab
+                document.querySelectorAll('.tab').forEach((t, idx) => {
+                    t.classList.toggle('active', idx === 1);
+                });
+                content.innerHTML = pages[1];
+                
+                // Reset chip after brief delay
+                setTimeout(() => {
+                    chipElement.classList.remove('dropping');
+                }, 100);
+            }, 1000);
+        }
+
+        function playPause() {
+            isPlaying = !isPlaying;
+            const btn = document.querySelector('.control-btn');
+            if (isPlaying) {
+                btn.textContent = 'PAUSE';
+                btn.classList.add('pause');
+                // Here you would start audio playback
+                console.log(`Playing: ${currentChip}`);
+            } else {
+                btn.textContent = 'PLAY';
+                btn.classList.remove('pause');
+                // Here you would pause audio playback
+                console.log(`Paused: ${currentChip}`);
+            }
+        }
+
+        function playChip() {
+            if (currentChip) {
+                alert(`Now playing: ${currentChip}`);
+                // Here you would integrate actual audio playback
+            }
+        }
+    </script>
+</body>
+</html>
