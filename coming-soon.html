@@ -398,10 +398,10 @@
         .chip-slot {
             position: absolute;
             top: 70%;
-            left: 35%;
+            left: 42.5%;
             transform: translate(-50%, -50%);
             width: 300px;
-            height: 250px;
+            height: 280px;
             border: 3px dashed #ccc;
             display: flex;
             flex-direction: column;
@@ -518,6 +518,37 @@
         .time-display {
             min-width: 35px;
             text-align: center;
+        }
+
+        .volume-container {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 10px;
+            color: #666;
+        }
+
+        .volume-icon {
+            font-size: 14px;
+            min-width: 20px;
+            text-align: center;
+        }
+
+        .volume-slider {
+            flex: 1;
+            height: 6px;
+            background: #ddd;
+            border: 1px solid #000;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .volume-level {
+            height: 100%;
+            background: #555;
+            width: 100%;
+            transition: width 0.1s linear;
         }
 
         .control-btn {
@@ -1159,6 +1190,12 @@
                                 </div>
                                 <span class="time-display" id="totalTime">0:00</span>
                             </div>
+                            <div class="volume-container">
+                                <span class="volume-icon">🔊</span>
+                                <div class="volume-slider" onclick="setVolume(event)">
+                                    <div class="volume-level" id="volumeLevel"></div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 `;
@@ -1188,6 +1225,7 @@
             if (isPlaying) {
                 if (!currentAudio) {
                     currentAudio = new Audio(currentChip.audio_url);
+                    currentAudio.volume = 1.0; // Default volume at 100%
                     
                     // Update time display and progress bar
                     currentAudio.addEventListener('timeupdate', updateProgress);
@@ -1239,6 +1277,22 @@
             const percentage = x / rect.width;
             
             currentAudio.currentTime = percentage * currentAudio.duration;
+        }
+
+        function setVolume(event) {
+            if (!currentAudio) return;
+            
+            const slider = event.currentTarget;
+            const rect = slider.getBoundingClientRect();
+            const x = event.clientX - rect.left;
+            const percentage = Math.max(0, Math.min(1, x / rect.width));
+            
+            currentAudio.volume = percentage;
+            
+            const volumeLevel = document.getElementById('volumeLevel');
+            if (volumeLevel) {
+                volumeLevel.style.width = (percentage * 100) + '%';
+            }
         }
 
         function formatTime(seconds) {
