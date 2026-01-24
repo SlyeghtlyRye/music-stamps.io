@@ -398,10 +398,10 @@
         .chip-slot {
             position: absolute;
             top: 70%;
-            left: 50%;
+            left: 35%;
             transform: translate(-50%, -50%);
             width: 300px;
-            height: 200px;
+            height: 250px;
             border: 3px dashed #ccc;
             display: flex;
             flex-direction: column;
@@ -480,6 +480,44 @@
         .player-controls {
             display: flex;
             gap: 10px;
+            flex-direction: column;
+            width: 100%;
+        }
+
+        .control-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .scrubber-container {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 10px;
+            color: #666;
+        }
+
+        .scrubber {
+            flex: 1;
+            height: 6px;
+            background: #ddd;
+            border: 1px solid #000;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .scrubber-progress {
+            height: 100%;
+            background: #ff0000;
+            width: 0%;
+            transition: width 0.1s linear;
+        }
+
+        .time-display {
+            min-width: 35px;
+            text-align: center;
         }
 
         .control-btn {
@@ -1111,7 +1149,16 @@
                             <div class="track-details">${song.artist} • ${song.album}</div>
                         </div>
                         <div class="player-controls">
-                            <button class="control-btn" onclick="playPause()">PLAY</button>
+                            <div class="control-buttons">
+                                <button class="control-btn" onclick="playPause()">PLAY</button>
+                            </div>
+                            <div class="scrubber-container">
+                                <span class="time-display" id="currentTime">0:00</span>
+                                <div class="scrubber" onclick="seek(event)">
+                                    <div class="scrubber-progress" id="progress"></div>
+                                </div>
+                                <span class="time-display" id="totalTime">0:00</span>
+                            </div>
                         </div>
                     </div>
                 `;
@@ -1141,6 +1188,17 @@
             if (isPlaying) {
                 if (!currentAudio) {
                     currentAudio = new Audio(currentChip.audio_url);
+                    
+                    // Update time display and progress bar
+                    currentAudio.addEventListener('timeupdate', updateProgress);
+                    currentAudio.addEventListener('loadedmetadata', () => {
+                        document.getElementById('totalTime').textContent = formatTime(currentAudio.duration);
+                    });
+                    currentAudio.addEventListener('ended', () => {
+                        isPlaying = false;
+                        btn.textContent = 'PLAY';
+                        btn.classList.remove('pause');
+                    });
                 }
                 currentAudio.play();
                 btn.textContent = 'PAUSE';
@@ -1154,6 +1212,41 @@
                 btn.classList.remove('pause');
                 console.log(`Paused: ${currentChip.name}`);
             }
+        }
+
+        function updateProgress() {
+            if (!currentAudio) return;
+            
+            const progress = (currentAudio.currentTime / currentAudio.duration) * 100;
+            const progressBar = document.getElementById('progress');
+            const currentTimeDisplay = document.getElementById('currentTime');
+            
+            if (progressBar) {
+                progressBar.style.width = progress + '%';
+            }
+            
+            if (currentTimeDisplay) {
+                currentTimeDisplay.textContent = formatTime(currentAudio.currentTime);
+            }
+        }
+
+        function seek(event) {
+            if (!currentAudio) return;
+            
+            const scrubber = event.currentTarget;
+            const rect = scrubber.getBoundingClientRect();
+            const x = event.clientX - rect.left;
+            const percentage = x / rect.width;
+            
+            currentAudio.currentTime = percentage * currentAudio.duration;
+        }
+
+        function formatTime(seconds) {
+            if (isNaN(seconds)) return '0:00';
+            
+            const mins = Math.floor(seconds / 60);
+            const secs = Math.floor(seconds % 60);
+            return `${mins}:${secs.toString().padStart(2, '0')}`;
         }
     </script>
 </body>
