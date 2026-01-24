@@ -100,7 +100,7 @@
             right: 15px;
             font-size: 24px;
             cursor: pointer;
-            color: #4040;
+            color: #666;
         }
 
         .modal-close:hover {
@@ -192,7 +192,7 @@
         }
 
         .cancel-btn {
-            background: #4040;
+            background: #666;
             flex: 1;
         }
 
@@ -474,7 +474,7 @@
 
         .track-details {
             font-size: 12px;
-            color: #4040;
+            color: #666;
         }
 
         .player-controls {
@@ -496,7 +496,7 @@
             align-items: center;
             gap: 8px;
             font-size: 10px;
-            color: #4040;
+            color: #666;
         }
 
         .scrubber {
@@ -526,9 +526,9 @@
             align-items: center;
             gap: 8px;
             font-size: 10px;
-            color: #404040;
-            padding: 0 32px;
-            margin-left: -12px;
+            color: #4040;
+            padding: 0 43px;
+            margin-left: -8px;
         }
 
         .volume-icon {
@@ -1088,7 +1088,7 @@
         const pages = {
             0: '',
             1: '',
-            2: '<h2>About</h2><p>Developer and creator.</p><p style="margin-top: 20px;"><a href="index.html" style="color: #4040; text-decoration: none; cursor: default; font-size: 14px;">-Go back to Title</a></p>',
+            2: '<h2>About</h2><p>Developer and creator.</p><p style="margin-top: 20px;"><a href="index.html" style="color: #666; text-decoration: none; cursor: default; font-size: 14px;">-Go back to Title</a></p>',
             3: '<h2>Contact</h2><p>Get in touch.</p>'
         };
 
@@ -1195,7 +1195,7 @@
                             <div class="volume-container">
                                 <span class="volume-icon">🔊</span>
                                 <div class="volume-slider" onclick="setVolume(event)">
-                                    <div class="volume-level" id="volumeLevel"></div>
+                                    <div class="volume-level" id="volumeLevel" style="width: 65%;"></div>
                                 </div>
                             </div>
                         </div>
@@ -1227,7 +1227,7 @@
             if (isPlaying) {
                 if (!currentAudio) {
                     currentAudio = new Audio(currentChip.audio_url);
-                    currentAudio.volume = 1.0; // Default volume at 100%
+                    currentAudio.volume = 0.65; // Default volume at 65%
                     
                     // Update time display and progress bar
                     currentAudio.addEventListener('timeupdate', updateProgress);
