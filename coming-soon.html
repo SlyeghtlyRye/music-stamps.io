@@ -802,6 +802,10 @@
                     authToken = data.token;
                     localStorage.setItem('authToken', data.token);
                     closeModal();
+                    
+                    // Re-render songs to show edit buttons
+                    renderSongs();
+                    
                     uploadModal.classList.add('active');
                 } else {
                     errorMsg.textContent = data.error || 'Login failed';
