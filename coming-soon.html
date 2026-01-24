@@ -175,6 +175,31 @@
             display: block;
         }
 
+        /* Edit/Delete Modal */
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .delete-btn {
+            background: #333;
+            flex: 1;
+        }
+
+        .delete-btn:hover {
+            background: #000;
+        }
+
+        .cancel-btn {
+            background: #666;
+            flex: 1;
+        }
+
+        .cancel-btn:hover {
+            background: #555;
+        }
+
         /* Upload Form */
         .upload-form {
             display: none;
@@ -258,6 +283,32 @@
         .music-chip:hover {
             transform: scale(1.05);
             box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+
+        .edit-btn {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            width: 20px;
+            height: 20px;
+            background: #ff0000;
+            border: 1px solid #000;
+            border-radius: 3px;
+            color: #fff;
+            font-size: 12px;
+            cursor: pointer;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+        }
+
+        .music-chip:hover .edit-btn {
+            display: flex;
+        }
+
+        .edit-btn:hover {
+            background: #cc0000;
         }
 
         .music-chip.dropping {
@@ -591,6 +642,36 @@
         </div>
     </div>
 
+    <!-- Edit Modal -->
+    <div class="modal" id="editModal">
+        <div class="modal-content">
+            <span class="modal-close" onclick="closeEditModal()">&times;</span>
+            <h2>Edit Song</h2>
+            <form id="editForm" class="upload-form active" onsubmit="handleEdit(event)">
+                <input type="hidden" id="editSongId">
+                <div class="form-group">
+                    <label for="editSongName">Song Name</label>
+                    <input type="text" id="editSongName" name="editSongName" required>
+                </div>
+                <div class="form-group">
+                    <label for="editArtistName">Artist Name</label>
+                    <input type="text" id="editArtistName" name="editArtistName" required>
+                </div>
+                <div class="form-group">
+                    <label for="editAlbumName">Album Name</label>
+                    <input type="text" id="editAlbumName" name="editAlbumName" required>
+                </div>
+                <button type="submit" class="submit-btn" id="editBtn">Save Changes</button>
+                <div class="action-buttons">
+                    <button type="button" class="submit-btn delete-btn" onclick="confirmDelete()">Delete Song</button>
+                    <button type="button" class="submit-btn cancel-btn" onclick="closeEditModal()">Cancel</button>
+                </div>
+                <div class="error-message" id="editError"></div>
+                <div class="success-message" id="editSuccess"></div>
+            </form>
+        </div>
+    </div>
+
     <script>
         const AUTH_API_URL = 'https://music-stamps-auth.rybutler1000.workers.dev';
         
@@ -602,6 +683,7 @@
         const welcomeMessage = document.getElementById('welcomeMessage');
         const loginModal = document.getElementById('loginModal');
         const uploadModal = document.getElementById('uploadModal');
+        const editModal = document.getElementById('editModal');
         
         let currentChip = null;
         let currentAudio = null;
@@ -610,6 +692,7 @@
         let tipTimeout = null;
         let authToken = null;
         let allSongs = [];
+        let editingSongId = null;
 
         // Load songs and check auth on page load
         window.addEventListener('load', async () => {
@@ -666,8 +749,17 @@
             allSongs.forEach(song => {
                 const chip = document.createElement('div');
                 chip.className = 'music-chip';
-                chip.onclick = () => loadChip(song);
+                chip.onclick = (e) => {
+                    // Don't load chip if clicking edit button
+                    if (!e.target.classList.contains('edit-btn')) {
+                        loadChip(song);
+                    }
+                };
+                
+                const editBtn = authToken ? '<div class="edit-btn" onclick="openEditModal(\'' + song.id + '\', event)">✎</div>' : '';
+                
                 chip.innerHTML = `
+                    ${editBtn}
                     <div>♪</div>
                     <div class="chip-label">${song.name}</div>
                 `;
@@ -798,6 +890,117 @@
             document.getElementById('uploadForm').reset();
             document.getElementById('uploadError').classList.remove('show');
             document.getElementById('uploadSuccess').classList.remove('show');
+        }
+
+        function openEditModal(songId, event) {
+            event.stopPropagation();
+            
+            const song = allSongs.find(s => s.id === songId);
+            if (!song) return;
+            
+            editingSongId = songId;
+            document.getElementById('editSongId').value = songId;
+            document.getElementById('editSongName').value = song.name;
+            document.getElementById('editArtistName').value = song.artist;
+            document.getElementById('editAlbumName').value = song.album;
+            
+            editModal.classList.add('active');
+        }
+
+        function closeEditModal() {
+            editModal.classList.remove('active');
+            editingSongId = null;
+            document.getElementById('editForm').reset();
+            document.getElementById('editError').classList.remove('show');
+            document.getElementById('editSuccess').classList.remove('show');
+        }
+
+        async function handleEdit(event) {
+            event.preventDefault();
+            
+            const editBtn = document.getElementById('editBtn');
+            const errorMsg = document.getElementById('editError');
+            const successMsg = document.getElementById('editSuccess');
+            
+            const songId = document.getElementById('editSongId').value;
+            const songName = document.getElementById('editSongName').value;
+            const artistName = document.getElementById('editArtistName').value;
+            const albumName = document.getElementById('editAlbumName').value;
+            
+            editBtn.disabled = true;
+            editBtn.textContent = 'Saving...';
+            errorMsg.classList.remove('show');
+            successMsg.classList.remove('show');
+            
+            try {
+                const response = await fetch(`${AUTH_API_URL}/songs/${songId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        name: songName,
+                        artist: artistName,
+                        album: albumName
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    successMsg.textContent = 'Song updated successfully!';
+                    successMsg.classList.add('show');
+                    
+                    await loadSongs();
+                    
+                    setTimeout(() => {
+                        closeEditModal();
+                    }, 1500);
+                } else {
+                    errorMsg.textContent = data.error || 'Update failed';
+                    errorMsg.classList.add('show');
+                }
+            } catch (error) {
+                errorMsg.textContent = 'Update error. Please try again.';
+                errorMsg.classList.add('show');
+            } finally {
+                editBtn.disabled = false;
+                editBtn.textContent = 'Save Changes';
+            }
+        }
+
+        async function confirmDelete() {
+            if (!confirm('Are you sure you want to delete this song? This cannot be undone.')) {
+                return;
+            }
+            
+            const songId = document.getElementById('editSongId').value;
+            const errorMsg = document.getElementById('editError');
+            
+            errorMsg.classList.remove('show');
+            
+            try {
+                const response = await fetch(`${AUTH_API_URL}/songs/${songId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    await loadSongs();
+                    closeEditModal();
+                } else {
+                    errorMsg.textContent = data.error || 'Delete failed';
+                    errorMsg.classList.add('show');
+                }
+            } catch (error) {
+                errorMsg.textContent = 'Delete error. Please try again.';
+                errorMsg.classList.add('show');
+            }
         }
 
         welcomeMessage.addEventListener('click', function(e) {
