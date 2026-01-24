@@ -526,8 +526,8 @@
             align-items: center;
             gap: 8px;
             font-size: 10px;
-            color: #4040;
-            padding: 0 43px;
+            color: #666;
+            padding: 43px;
             margin-left: -8px;
         }
 
@@ -535,6 +535,13 @@
             font-size: 14px;
             min-width: 20px;
             text-align: center;
+            cursor: pointer;
+            user-select: none;
+            transition: transform 0.2s;
+        }
+
+        .volume-icon:hover {
+            transform: scale(1.15);
         }
 
         .volume-slider {
@@ -764,6 +771,8 @@
         let authToken = null;
         let allSongs = [];
         let editingSongId = null;
+        let isMuted = false;
+        let volumeBeforeMute = 0.65;
 
         // Load songs and check auth on page load
         window.addEventListener('load', async () => {
@@ -1193,7 +1202,7 @@
                                 <span class="time-display" id="totalTime">0:00</span>
                             </div>
                             <div class="volume-container">
-                                <span class="volume-icon">🔊</span>
+                                <span class="volume-icon" id="volumeIcon" onclick="toggleMute()">🔊</span>
                                 <div class="volume-slider" onclick="setVolume(event)">
                                     <div class="volume-level" id="volumeLevel" style="width: 65%;"></div>
                                 </div>
@@ -1290,10 +1299,48 @@
             const percentage = Math.max(0, Math.min(1, x / rect.width));
             
             currentAudio.volume = percentage;
+            volumeBeforeMute = percentage;
+            isMuted = false;
             
             const volumeLevel = document.getElementById('volumeLevel');
             if (volumeLevel) {
                 volumeLevel.style.width = (percentage * 100) + '%';
+            }
+            
+            updateVolumeIcon();
+        }
+
+        function toggleMute() {
+            if (!currentAudio) return;
+            
+            isMuted = !isMuted;
+            
+            if (isMuted) {
+                volumeBeforeMute = currentAudio.volume;
+                currentAudio.volume = 0;
+                const volumeLevel = document.getElementById('volumeLevel');
+                if (volumeLevel) {
+                    volumeLevel.style.width = '0%';
+                }
+            } else {
+                currentAudio.volume = volumeBeforeMute;
+                const volumeLevel = document.getElementById('volumeLevel');
+                if (volumeLevel) {
+                    volumeLevel.style.width = (volumeBeforeMute * 100) + '%';
+                }
+            }
+            
+            updateVolumeIcon();
+        }
+
+        function updateVolumeIcon() {
+            const icon = document.getElementById('volumeIcon');
+            if (!icon) return;
+            
+            if (isMuted || (currentAudio && currentAudio.volume === 0)) {
+                icon.textContent = '🔇';
+            } else {
+                icon.textContent = '🔊';
             }
         }
 
