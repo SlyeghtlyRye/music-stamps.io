@@ -90,6 +90,8 @@
             max-width: 400px;
             width: 90%;
             position: relative;
+            max-height: 90vh;
+            overflow-y: auto;
         }
 
         .modal-close {
@@ -146,7 +148,7 @@
             transition: all 0.2s;
         }
 
-        .submit-btn:hover {
+        .submit-btn:hover:not(:disabled) {
             background: #cc0000;
         }
 
@@ -155,14 +157,21 @@
             cursor: not-allowed;
         }
 
-        .error-message {
-            color: #ff0000;
+        .error-message, .success-message {
             font-size: 12px;
             margin-top: 10px;
             display: none;
         }
 
-        .error-message.show {
+        .error-message {
+            color: #ff0000;
+        }
+
+        .success-message {
+            color: #008000;
+        }
+
+        .error-message.show, .success-message.show {
             display: block;
         }
 
@@ -269,6 +278,10 @@
             margin-top: 8px;
             text-align: center;
             font-size: 10px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            width: 90px;
         }
 
         /* Player Area */
@@ -497,24 +510,9 @@
         <div class="back-arrow" id="backArrow" onclick="panToProjects()">↓</div>
         <div class="scene" id="scene">
             <!-- Chip Selection Area (Above) -->
-            <div class="chip-shelf">
+            <div class="chip-shelf" id="chipShelf">
                 <button class="add-song-btn" onclick="handleAddSong()">+</button>
-                <div class="music-chip" onclick="loadChip('Song A', this)">
-                    <div>♪</div>
-                    <div class="chip-label">SONG A</div>
-                </div>
-                <div class="music-chip" onclick="loadChip('Song B', this)">
-                    <div>♫</div>
-                    <div class="chip-label">SONG B</div>
-                </div>
-                <div class="music-chip" onclick="loadChip('Song C', this)">
-                    <div>♪</div>
-                    <div class="chip-label">SONG C</div>
-                </div>
-                <div class="music-chip" onclick="loadChip('Song D', this)">
-                    <div>♫</div>
-                    <div class="chip-label">SONG D</div>
-                </div>
+                <!-- Songs will be loaded here dynamically -->
             </div>
 
             <!-- Player Area (Below) -->
@@ -569,7 +567,7 @@
         <div class="modal-content">
             <span class="modal-close" onclick="closeUploadModal()">&times;</span>
             <h2>Add New Song</h2>
-            <div class="upload-form active">
+            <form id="uploadForm" class="upload-form active" onsubmit="handleUpload(event)">
                 <div class="form-group">
                     <label for="songName">Song Name</label>
                     <input type="text" id="songName" name="songName" required>
@@ -583,34 +581,41 @@
                     <input type="text" id="albumName" name="albumName" required>
                 </div>
                 <div class="form-group">
-                    <label for="songFile">Audio File (Coming Soon)</label>
-                    <input type="file" id="songFile" name="songFile" accept="audio/*" disabled>
+                    <label for="songFile">Audio File</label>
+                    <input type="file" id="songFile" name="songFile" accept="audio/*" required>
                 </div>
-                <button type="button" class="submit-btn" onclick="handleUpload()">Upload Song (Demo)</button>
-            </div>
+                <button type="submit" class="submit-btn" id="uploadBtn">Upload Song</button>
+                <div class="error-message" id="uploadError"></div>
+                <div class="success-message" id="uploadSuccess"></div>
+            </form>
         </div>
     </div>
 
     <script>
-        // Configuration - Replace with your Cloudflare Worker URL
         const AUTH_API_URL = 'https://music-stamps-auth.rybutler1000.workers.dev';
         
         const scene = document.getElementById('scene');
         const content = document.getElementById('content');
         const chipSlot = document.getElementById('chipSlot');
+        const chipShelf = document.getElementById('chipShelf');
         const backArrow = document.getElementById('backArrow');
         const welcomeMessage = document.getElementById('welcomeMessage');
         const loginModal = document.getElementById('loginModal');
         const uploadModal = document.getElementById('uploadModal');
         
         let currentChip = null;
+        let currentAudio = null;
         let hasClickedTab = false;
         let isPlaying = false;
         let tipTimeout = null;
         let authToken = null;
+        let allSongs = [];
 
-        // Check for existing session on page load
-        window.addEventListener('load', checkAuth);
+        // Load songs and check auth on page load
+        window.addEventListener('load', async () => {
+            await checkAuth();
+            await loadSongs();
+        });
 
         async function checkAuth() {
             const token = localStorage.getItem('authToken');
@@ -634,10 +639,40 @@
                     console.error('Auth check failed:', error);
                 }
                 
-                // Invalid token, clear it
                 localStorage.removeItem('authToken');
                 authToken = null;
             }
+        }
+
+        async function loadSongs() {
+            try {
+                const response = await fetch(`${AUTH_API_URL}/songs`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    allSongs = data.songs;
+                    renderSongs();
+                }
+            } catch (error) {
+                console.error('Failed to load songs:', error);
+            }
+        }
+
+        function renderSongs() {
+            const addBtn = chipShelf.querySelector('.add-song-btn');
+            chipShelf.innerHTML = '';
+            chipShelf.appendChild(addBtn);
+            
+            allSongs.forEach(song => {
+                const chip = document.createElement('div');
+                chip.className = 'music-chip';
+                chip.onclick = () => loadChip(song);
+                chip.innerHTML = `
+                    <div>♪</div>
+                    <div class="chip-label">${song.name}</div>
+                `;
+                chipShelf.appendChild(chip);
+            });
         }
 
         async function handleAddSong() {
@@ -689,6 +724,69 @@
             }
         }
 
+        async function handleUpload(event) {
+            event.preventDefault();
+            
+            const uploadBtn = document.getElementById('uploadBtn');
+            const errorMsg = document.getElementById('uploadError');
+            const successMsg = document.getElementById('uploadSuccess');
+            const songFile = document.getElementById('songFile').files[0];
+            const songName = document.getElementById('songName').value;
+            const artistName = document.getElementById('artistName').value;
+            const albumName = document.getElementById('albumName').value;
+            
+            if (!songFile) {
+                errorMsg.textContent = 'Please select an audio file';
+                errorMsg.classList.add('show');
+                return;
+            }
+            
+            uploadBtn.disabled = true;
+            uploadBtn.textContent = 'Uploading...';
+            errorMsg.classList.remove('show');
+            successMsg.classList.remove('show');
+            
+            try {
+                const formData = new FormData();
+                formData.append('audioFile', songFile);
+                formData.append('songName', songName);
+                formData.append('artistName', artistName);
+                formData.append('albumName', albumName);
+                
+                const response = await fetch(`${AUTH_API_URL}/songs/upload`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`
+                    },
+                    body: formData
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    successMsg.textContent = 'Song uploaded successfully!';
+                    successMsg.classList.add('show');
+                    document.getElementById('uploadForm').reset();
+                    
+                    // Reload songs
+                    await loadSongs();
+                    
+                    setTimeout(() => {
+                        closeUploadModal();
+                    }, 2000);
+                } else {
+                    errorMsg.textContent = data.error || 'Upload failed';
+                    errorMsg.classList.add('show');
+                }
+            } catch (error) {
+                errorMsg.textContent = 'Upload error. Please try again.';
+                errorMsg.classList.add('show');
+            } finally {
+                uploadBtn.disabled = false;
+                uploadBtn.textContent = 'Upload Song';
+            }
+        }
+
         function closeModal() {
             loginModal.classList.remove('active');
             document.getElementById('loginForm').reset();
@@ -697,22 +795,11 @@
 
         function closeUploadModal() {
             uploadModal.classList.remove('active');
+            document.getElementById('uploadForm').reset();
+            document.getElementById('uploadError').classList.remove('show');
+            document.getElementById('uploadSuccess').classList.remove('show');
         }
 
-        function handleUpload() {
-            const songName = document.getElementById('songName').value;
-            const artistName = document.getElementById('artistName').value;
-            const albumName = document.getElementById('albumName').value;
-            
-            if (songName && artistName && albumName) {
-                alert(`Song upload demo:\nSong: ${songName}\nArtist: ${artistName}\nAlbum: ${albumName}\n\nFile upload will be implemented next!`);
-                closeUploadModal();
-            } else {
-                alert('Please fill in all fields');
-            }
-        }
-
-        // Add click handler to welcome message
         welcomeMessage.addEventListener('click', function(e) {
             e.stopPropagation();
             if (hasClickedTab) {
@@ -788,19 +875,33 @@
             }, 10000);
         }
 
-        function loadChip(name, chipElement) {
-            chipElement.classList.add('dropping');
+        function loadChip(song) {
+            const chipElements = chipShelf.querySelectorAll('.music-chip:not(.add-song-btn)');
+            const chipElement = Array.from(chipElements).find(el => 
+                el.querySelector('.chip-label').textContent === song.name
+            );
+            
+            if (chipElement) {
+                chipElement.classList.add('dropping');
+            }
 
             setTimeout(() => {
-                currentChip = name;
+                currentChip = song;
                 isPlaying = false;
+                
+                // Stop previous audio if any
+                if (currentAudio) {
+                    currentAudio.pause();
+                    currentAudio = null;
+                }
+                
                 chipSlot.classList.add('has-chip');
                 chipSlot.innerHTML = `
                     <div class="loaded-chip">
                         <div class="chip-icon">♪</div>
                         <div class="track-info">
-                            <div class="track-title">${name}</div>
-                            <div class="track-details">Artist Name • Album Title</div>
+                            <div class="track-title">${song.name}</div>
+                            <div class="track-details">${song.artist} • ${song.album}</div>
                         </div>
                         <div class="player-controls">
                             <button class="control-btn" onclick="playPause()">PLAY</button>
@@ -816,23 +917,35 @@
                 });
                 content.innerHTML = pages[1];
                 
-                setTimeout(() => {
-                    chipElement.classList.remove('dropping');
-                }, 100);
+                if (chipElement) {
+                    setTimeout(() => {
+                        chipElement.classList.remove('dropping');
+                    }, 100);
+                }
             }, 1000);
         }
 
         function playPause() {
+            if (!currentChip) return;
+            
             isPlaying = !isPlaying;
             const btn = document.querySelector('.control-btn');
+            
             if (isPlaying) {
+                if (!currentAudio) {
+                    currentAudio = new Audio(currentChip.audio_url);
+                }
+                currentAudio.play();
                 btn.textContent = 'PAUSE';
                 btn.classList.add('pause');
-                console.log(`Playing: ${currentChip}`);
+                console.log(`Playing: ${currentChip.name}`);
             } else {
+                if (currentAudio) {
+                    currentAudio.pause();
+                }
                 btn.textContent = 'PLAY';
                 btn.classList.remove('pause');
-                console.log(`Paused: ${currentChip}`);
+                console.log(`Paused: ${currentChip.name}`);
             }
         }
     </script>
