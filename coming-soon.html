@@ -92,6 +92,7 @@
             position: relative;
             max-height: 90vh;
             overflow-y: auto;
+            
         }
 
         .modal-close {
@@ -611,10 +612,11 @@
                 max-width: 100%;
                 min-width: 280px;
                 overflow-y: auto;
+                display: block;
             }
 
             .chip-slot {
-                position: relative !important;
+                position: static !important; /* Changed from relative to static */
                 transform: none !important;
                 width: 100%;
                 max-width: 100%;
@@ -633,7 +635,7 @@
             }
 
             .qr-display {
-                position: relative !important;
+            position: static !important; /* Changed from relative to static */
                 transform: none !important;
                 width: 100%;
                 max-width: 100%;
