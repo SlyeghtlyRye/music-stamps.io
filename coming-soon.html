@@ -1511,11 +1511,14 @@
                 upArrow.classList.add('visible');
                 // Only show QR if a chip is loaded
                 if (currentChip && currentChip.qr_code_url) {
+                    qrImage.src = currentChip.qr_code_url;
                     qrDisplay.classList.add('visible');
                 }
             } else {
                 chipSlot.classList.remove('visible');
-                qrDisplay.classList.remove('visible'); // Hide QR on non-PROJECTS tabs
+                // Clear QR code completely
+                qrDisplay.classList.remove('visible');
+                qrImage.src = '';
                 upArrow.classList.remove('visible');
                 downArrow.classList.remove('visible');
                 scene.classList.remove('projects-view');
