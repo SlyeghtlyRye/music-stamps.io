@@ -590,12 +590,13 @@
                 display: flex;
                 flex-direction: row;
                 align-items: flex-start;
-                height: 500px; /* Change this to make it taller - try 500px, 600px, etc. */
+                height: 5000px;
                 max-height: none;
                 min-height: unset;
                 transform: translateY(20px);
-                position: relative;
-                z-index: 100;
+                position: relative; /* ADD THIS */
+                z-index: 100; /* ADD THIS - same or higher than the arrow */
+                
             }
 
             .tabs-row {
