@@ -474,27 +474,43 @@
             border-style: solid;
         }
 
+
         /* QR Code Display */
         .qr-display {
-            position: static !important;
-            transform: none !important;
-            width: auto !important;
-            max-width: 200px !important;
-            margin: 20px auto 20px auto !important;
-            height: auto !important;
-            left: auto !important;
-            top: auto !important;
+            position: absolute;
+            right: 10%;
+            top: 45%;
+            transform: translate(-50%, -50%);
+            width: auto;
+            max-width: 200px;
+            height: auto;
             padding: 15px;
-            display: flex !important; /* Change to flex */
-            flex-direction: column !important; /* Stack vertically */
-            align-items: center !important; /* Center horizontally */
-            float: none !important;
-            clear: both !important;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
             opacity: 0;
             pointer-events: none;
+            border: 3px dashed #ccc; /* Add placeholder border */
+            background: #fff; /* Add background */
+            min-height: 280px; /* Match chip slot height */
+            min-width: 200px; /* Set minimum width */
         }
 
         .qr-display.visible {
+            opacity: 1;
+            pointer-events: auto;
+            border-color: #000; /* Solid border when visible */
+            border-style: solid; /* Solid border when visible */
+        }
+
+        /* Show QR placeholder when PROJECTS tab is active */
+        .tab.active:nth-child(2) ~ .content-box .qr-display {
+            opacity: 1; /* CHANGED from 0.5 to 1 */
+            pointer-events: none;
+        }
+
+        /* Full opacity when QR is actually loaded */
+        .tab.active:nth-child(2) ~ .content-box .qr-display.visible {
             opacity: 1;
             pointer-events: auto;
         }
@@ -676,10 +692,17 @@
                 align-items: center;
                 opacity: 0;
                 pointer-events: none;
+                border: 3px dashed #ccc; /* Add placeholder border */
+                background: #fff; /* Add background */
+                min-height: 280px; /* Match chip slot height */
+                min-width: 200px; /* Set minimum width */
             }
 
             .qr-display.visible {
                 opacity: 1 !important;
+                pointer-events: auto;
+                border-color: #000; /* Solid border when visible */
+                border-style: solid; /* Solid border when visible */
             }
 
             .qr-display img {
