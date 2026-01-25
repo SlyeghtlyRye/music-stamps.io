@@ -564,7 +564,7 @@
             }
 
             .player-area {
-                padding: 20px 10px;
+                padding: 0px 10px;
                 height: 100vh;
                 min-height: 100vh;
                 width: 100%;
@@ -573,7 +573,7 @@
                 justify-content: center;
                 position: relative;
                 overflow: hidden;
-                padding-top: 0px; /* ADD THIS - adjusts how high */
+                transform: translateY(-50px);
             }
 
             .container {
@@ -587,9 +587,10 @@
                 height: fit-content;
                 max-height: none;
                 min-height: unset;
-                transform: translateY(0px);
+                transform: translateY(20px);
                 position: relative; /* ADD THIS */
                 z-index: 100; /* ADD THIS - same or higher than the arrow */
+                
             }
 
             .tabs-row {
