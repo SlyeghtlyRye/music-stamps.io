@@ -1296,6 +1296,13 @@
                 chipShelf.appendChild(chip);
             });
 
+            // 2. Fill remaining slots using allSongs.length instead of songsToShow
+            const placeholder = document.createElement('div');
+                placeholder.className = 'music-chip';
+                placeholder.style.opacity = '0.3';
+                placeholder.style.cursor = 'default';
+                placeholder.innerHTML = `<div>♪</div><div class="chip-label">Empty</div>`;
+                chipShelf.appendChild(placeholder);
         }
 
         async function handleAddSong() {
