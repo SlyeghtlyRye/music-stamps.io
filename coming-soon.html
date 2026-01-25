@@ -1195,33 +1195,21 @@
             // Check for track parameter in URL (from QR code)
             const urlParams = new URLSearchParams(window.location.search);
             const trackId = urlParams.get('track');
-
+            
             if (trackId) {
-                console.log('Track ID from URL:', trackId); // Debug log
-                
-                // Wait for songs to load
+                // Wait a moment for songs to load
                 setTimeout(() => {
-                    console.log('Available songs:', allSongs); // Debug log
+                    // Switch to PROJECTS tab
+                    switchTab(1);
                     
-                    // Find the song - try both string and exact match
-                    const song = allSongs.find(s => 
-                        s.id === trackId || 
-                        s.id === parseInt(trackId) || 
-                        String(s.id) === String(trackId)
-                    );
-                    
-                    console.log('Found song:', song); // Debug log
-                    
+                    // Find and load the song
+                    const song = allSongs.find(s => s.id === trackId);
                     if (song) {
-                        // Switch to PROJECTS tab
-                        switchTab(1);
-                        // Load the song chip
                         loadChip(song);
                     } else {
-                        console.error('Song not found for track ID:', trackId);
-                        console.error('Available IDs:', allSongs.map(s => s.id));
+                        console.error('Song not found:', trackId);
                     }
-                }, 1000); // Increased timeout to ensure songs are loaded
+                }, 500);
             }
         });
 
