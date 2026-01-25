@@ -679,30 +679,33 @@
             }
 
             .qr-display {
-                position: absolute;
-                right: 5%;
-                top: 45%;
-                transform: translate(-50%, -50%);
-                width: auto;
-                max-width: 200px;
-                height: auto;
+                position: static !important;
+                transform: none !important;
+                width: auto !important;
+                max-width: 200px !important;
+                margin: 20px auto 0 auto !important;
+                height: auto !important;
+                left: auto !important;
+                top: auto !important;
                 padding: 15px;
-                display: flex;
-                flex-direction: column;
-                align-items: center;
+                display: flex !important;
+                flex-direction: column !important;
+                align-items: center !important;
+                float: none !important;
+                clear: both !important;
+                border: 3px dashed #ccc;
+                background: #fff;
+                min-height: 280px;
+                min-width: 200px;
                 opacity: 0;
                 pointer-events: none;
-                border: 3px dashed #ccc; /* Add placeholder border */
-                background: #fff; /* Add background */
-                min-height: 280px; /* Match chip slot height */
-                min-width: 200px; /* Set minimum width */
             }
 
             .qr-display.visible {
                 opacity: 1 !important;
                 pointer-events: auto;
-                border-color: #000; /* Solid border when visible */
-                border-style: solid; /* Solid border when visible */
+                border-color: #000;
+                border-style: solid;
             }
 
             .qr-display img {
