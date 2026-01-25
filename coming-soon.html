@@ -865,6 +865,26 @@
         window.addEventListener('load', async () => {
             await checkAuth();
             await loadSongs();
+            
+            // Check for track parameter in URL (from QR code)
+            const urlParams = new URLSearchParams(window.location.search);
+            const trackId = urlParams.get('track');
+            
+            if (trackId) {
+                // Wait a moment for songs to load
+                setTimeout(() => {
+                    // Switch to PROJECTS tab
+                    switchTab(1);
+                    
+                    // Find and load the song
+                    const song = allSongs.find(s => s.id === trackId);
+                    if (song) {
+                        loadChip(song);
+                    } else {
+                        console.error('Song not found:', trackId);
+                    }
+                }, 500);
+            }
         });
 
         async function checkAuth() {
