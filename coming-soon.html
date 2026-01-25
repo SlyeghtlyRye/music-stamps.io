@@ -1232,6 +1232,22 @@
             chipShelf.innerHTML = '';
             chipShelf.appendChild(addBtn);
             
+            if (allSongs.length === 0) {
+                // Create 3 placeholder chips
+                for (let i = 0; i < 3; i++) {
+                    const placeholder = document.createElement('div');
+                    placeholder.className = 'music-chip';
+                    placeholder.style.opacity = '0.3';
+                    placeholder.style.cursor = 'default';
+                    placeholder.innerHTML = `
+                        <div>♪</div>
+                        <div class="chip-label">Empty</div>
+                    `;
+                    chipShelf.appendChild(placeholder);
+                }
+                return;
+            }
+            
             allSongs.forEach(song => {
                 const chip = document.createElement('div');
                 chip.className = 'music-chip';
