@@ -569,9 +569,9 @@
                 display: flex;
                 flex-direction: row;
                 align-items: stretch;
-                height: auto;
+                height: auto; /* Remove fixed height constraints */
                 max-height: none;
-                min-height: 70vh;
+                min-height: auto; /* Change from 70vh to auto */
             }
 
             .tabs-row {
@@ -613,20 +613,23 @@
                 min-width: 280px;
                 overflow-y: auto;
                 display: block;
+                min-height: auto; /* Remove the 70vh min-height */
+                height: auto; /* Let it size to content */
             }
 
             .chip-slot {
-                position: static !important; /* Changed from relative to static */
+                position: static !important;
                 transform: none !important;
-                width: 100%;
-                max-width: 100%;
-                margin: 0 !important;
-                height: auto;
+                width: 100% !important;
+                max-width: 100% !important;
+                margin: 0 auto !important; /* Center it */
+                height: auto !important;
                 min-height: 220px;
                 left: auto !important;
                 top: auto !important;
                 display: block !important;
                 float: none !important;
+                clear: both !important;
             }
 
             .chip-slot.visible {
@@ -635,12 +638,12 @@
             }
 
             .qr-display {
-            position: static !important; /* Changed from relative to static */
+                position: static !important;
                 transform: none !important;
-                width: 100%;
-                max-width: 100%;
-                margin: 20px 0 0 0 !important;
-                height: auto;
+                width: auto !important; /* Change from 100% to auto */
+                max-width: 200px !important; /* Restrict max width */
+                margin: 20px auto 20px auto !important; /* Center horizontally */
+                height: auto !important;
                 left: auto !important;
                 top: auto !important;
                 padding: 15px;
