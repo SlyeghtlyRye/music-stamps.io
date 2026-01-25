@@ -560,16 +560,14 @@
             }
 
             .player-area {
-                padding: 0 10px;
-                height: auto; /* Keep this */
-                min-height: auto; /* CHANGED from 100vh to auto */
+                padding: 20px 10px;
+                height: auto;
+                min-height: unset; /* Remove min-height completely */
                 width: 100%;
                 display: flex;
-                align-items: center;
+                align-items: flex-start; /* CHANGED from center to flex-start */
                 justify-content: center;
                 position: relative;
-                padding-top: 20px; /* Add some top padding */
-                padding-bottom: 20px; /* Add some bottom padding */
             }
 
             .container {
@@ -579,10 +577,10 @@
                 padding: 0;
                 display: flex;
                 flex-direction: row;
-                align-items: stretch;
-                height: auto;
+                align-items: flex-start; /* CHANGED from stretch to flex-start */
+                height: fit-content; /* CHANGED from auto to fit-content */
                 max-height: none;
-                min-height: auto;
+                min-height: unset; /* Remove min-height */
             }
 
             .tabs-row {
@@ -619,14 +617,14 @@
                 background: #fff;
                 position: relative;
                 order: 1;
-                flex: 1;
+                flex: 0 1 auto; /* CHANGED from flex: 1 to prevent stretching */
                 max-width: 100%;
                 min-width: 280px;
                 overflow-y: auto;
                 display: block;
-                min-height: auto; /* Remove the 70vh min-height */
-                height: auto; /* Let it size to content */
-                padding-bottom: 20px
+                min-height: unset; /* Remove min-height */
+                height: fit-content; /* CHANGED to fit-content */
+                padding-bottom: 20px;
             }
 
             .chip-slot {
