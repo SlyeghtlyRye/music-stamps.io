@@ -713,7 +713,7 @@
 
             .chip-shelf {
                 margin-top: 0;
-                padding: 60px 20px 20px 20px;
+                padding: 100px 20px 20px 20px;
                 height: 100vh;
                 min-height: 100vh;
                 position: relative;
@@ -1224,6 +1224,8 @@
                 }
             } catch (error) {
                 console.error('Failed to load songs:', error);
+                // Render placeholders when API fails (localhost)
+                renderSongs();
             }
         }
 
@@ -1232,8 +1234,8 @@
             chipShelf.innerHTML = '';
             chipShelf.appendChild(addBtn);
             
+            // If no songs loaded (API failed), show placeholders
             if (allSongs.length === 0) {
-                // Create 3 placeholder chips
                 for (let i = 0; i < 3; i++) {
                     const placeholder = document.createElement('div');
                     placeholder.className = 'music-chip';
@@ -1248,11 +1250,11 @@
                 return;
             }
             
+            // Render actual songs when they exist
             allSongs.forEach(song => {
                 const chip = document.createElement('div');
                 chip.className = 'music-chip';
                 chip.onclick = (e) => {
-                    // Don't load chip if clicking edit button
                     if (!e.target.classList.contains('edit-btn')) {
                         loadChip(song);
                     }
@@ -1267,6 +1269,20 @@
                 `;
                 chipShelf.appendChild(chip);
             });
+            
+            // Fill remaining slots with placeholders
+            const remainingSlots = totalSlots - songsToShow.length;
+            for (let i = 0; i < remainingSlots; i++) {
+                const placeholder = document.createElement('div');
+                placeholder.className = 'music-chip';
+                placeholder.style.opacity = '0.3';
+                placeholder.style.cursor = 'default';
+                placeholder.innerHTML = `
+                    <div>♪</div>
+                    <div class="chip-label">Empty</div>
+                `;
+                chipShelf.appendChild(placeholder);
+            }
         }
 
         async function handleAddSong() {
