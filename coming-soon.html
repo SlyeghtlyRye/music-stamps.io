@@ -487,6 +487,8 @@
             align-items: center !important; /* Center horizontally */
             float: none !important;
             clear: both !important;
+            opacity: 0;
+            pointer-events: none;
         }
 
         .qr-display.visible {
@@ -1507,9 +1509,13 @@
             if (i === 1) {
                 chipSlot.classList.add('visible');
                 upArrow.classList.add('visible');
+                // Only show QR if a chip is loaded
+                if (currentChip && currentChip.qr_code_url) {
+                    qrDisplay.classList.add('visible');
+                }
             } else {
                 chipSlot.classList.remove('visible');
-                qrDisplay.classList.remove('visible');
+                qrDisplay.classList.remove('visible'); // Hide QR on non-PROJECTS tabs
                 upArrow.classList.remove('visible');
                 downArrow.classList.remove('visible');
                 scene.classList.remove('projects-view');
@@ -1600,7 +1606,7 @@
                     </div>
                 `;
 
-                // Show QR code if available
+                // Show QR code if available (will be displayed since we're switching to PROJECTS)
                 if (song.qr_code_url) {
                     qrImage.src = song.qr_code_url;
                     qrDisplay.classList.add('visible');
