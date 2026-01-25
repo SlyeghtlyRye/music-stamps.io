@@ -436,7 +436,7 @@
         .chip-slot {
             position: absolute;
             top: 70%;
-            left: 42.5%;
+            left: 25%;
             transform: translate(-50%, -50%);
             width: 300px;
             height: 280px;
@@ -663,18 +663,19 @@
             }
 
             .qr-display {
-                position: static !important;
-                transform: none !important;
-                width: auto !important; /* Change from 100% to auto */
-                max-width: 200px !important; /* Restrict max width */
-                margin: 20px auto 0 auto !important; /* Changed bottom margin from 20px to 0 */
-                height: auto !important;
-                left: auto !important;
-                top: auto !important;
+                position: absolute;
+                left: 75%;
+                top: 70%;
+                transform: translate(-50%, -50%);
+                width: auto;
+                max-width: 200px;
+                height: auto;
                 padding: 15px;
-                display: block !important;
-                float: none !important;
-                clear: both !important;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                opacity: 0;
+                pointer-events: none;
             }
 
             .qr-display.visible {
