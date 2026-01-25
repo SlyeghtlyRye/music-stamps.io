@@ -592,12 +592,12 @@
                 display: flex;
                 flex-direction: row;
                 align-items: flex-start;
-                height: 500px; /* ADD THIS - fixed cassette height */
-                max-height: 500px; /* ADD THIS */
-                min-height: 500px; /* ADD THIS */
+                max-height: none;
+                min-height: unset;
                 transform: translateY(20px);
-                position: relative;
-                z-index: 100;
+                position: relative; /* ADD THIS */
+                z-index: 100; /* ADD THIS - same or higher than the arrow */
+                
             }
 
             .tabs-row {
@@ -637,14 +637,14 @@
                 background: #fff;
                 position: relative;
                 order: 1;
-                flex: 0 1 auto;
+                flex: 0 1 auto; /* CHANGED from flex: 1 to prevent stretching */
                 max-width: 100%;
                 min-width: 280px;
                 overflow-y: auto;
                 display: block;
-                height: 100%; /* CHANGED to fill container */
-                min-height: unset; /* REMOVE the min-height constraint */
-                max-height: unset; /* REMOVE the max-height constraint */
+                height: min-content;
+                min-height: 500px;
+                max-height: 500px;
                 padding-bottom: 0px;
             }
 
