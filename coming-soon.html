@@ -1261,7 +1261,10 @@
             const addBtn = chipShelf.querySelector('.add-song-btn');
             chipShelf.innerHTML = '';
             chipShelf.appendChild(addBtn);
-            
+
+            // 1. Define how many total slots you want to show on the shelf
+            const totalSlots = 8; 
+
             // If no songs loaded (API failed), show placeholders
             if (allSongs.length === 0) {
                 for (let i = 0; i < 3; i++) {
@@ -1269,16 +1272,13 @@
                     placeholder.className = 'music-chip';
                     placeholder.style.opacity = '0.3';
                     placeholder.style.cursor = 'default';
-                    placeholder.innerHTML = `
-                        <div>♪</div>
-                        <div class="chip-label">Empty</div>
-                    `;
+                    placeholder.innerHTML = `<div>♪</div><div class="chip-label">Empty</div>`;
                     chipShelf.appendChild(placeholder);
                 }
                 return;
             }
-            
-            // Render actual songs when they exist
+
+            // Render actual songs
             allSongs.forEach(song => {
                 const chip = document.createElement('div');
                 chip.className = 'music-chip';
@@ -1287,9 +1287,7 @@
                         loadChip(song);
                     }
                 };
-                
                 const editBtn = authToken ? '<div class="edit-btn" onclick="openEditModal(\'' + song.id + '\', event)">✎</div>' : '';
-                
                 chip.innerHTML = `
                     ${editBtn}
                     <div>♪</div>
@@ -1297,7 +1295,18 @@
                 `;
                 chipShelf.appendChild(chip);
             });
-            
+
+            // 2. Fill remaining slots using allSongs.length instead of songsToShow
+            const remainingSlots = totalSlots - allSongs.length;
+            for (let i = 0; i < remainingSlots; i++) {
+                if (remainingSlots <= 0) break;
+                const placeholder = document.createElement('div');
+                placeholder.className = 'music-chip';
+                placeholder.style.opacity = '0.3';
+                placeholder.style.cursor = 'default';
+                placeholder.innerHTML = `<div>♪</div><div class="chip-label">Empty</div>`;
+                chipShelf.appendChild(placeholder);
+            }
         }
 
         async function handleAddSong() {
