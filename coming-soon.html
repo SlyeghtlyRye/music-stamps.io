@@ -36,7 +36,7 @@
         /* Add Song Button */
         .add-song-btn {
             position: absolute;
-            top: -80px;
+            top: 0px;
             left: 50%;
             transform: translateX(-50%);
             background: none;
@@ -50,7 +50,7 @@
             opacity: 0;
             pointer-events: none;
             transition: all 0.3s;
-            z-index: 100;
+            z-index: 200;
             padding: 0;
             line-height: 1;
         }
@@ -535,7 +535,7 @@
         }
 
         /* Mobile Responsive - Vertical Layout */
-        @media (max-width: 768px) {
+        
             body {
                 overflow: hidden; /* CHANGE from overflow-y: auto */
                 height: 100vh;
@@ -741,8 +741,24 @@
             }
 
             .add-song-btn {
-                top: 20px;
-                font-size: 36px;
+                position: absolute;
+                top: 0px;
+                left: 50%;
+                transform: translateX(-50%);
+                background: none;
+                border: none;
+                font-size: 48px;
+                color: #000;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                opacity: 0;
+                pointer-events: none;
+                transition: all 0.3s;
+                z-index: 200;
+                padding: 5;
+                line-height: 1;
             }
 
             .welcome-message {
