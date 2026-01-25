@@ -367,6 +367,7 @@
         .container {
             max-width: 800px;
             width: 100%;
+            height: 400px; /* Lock cassette height */
         }
 
         .tabs-row {
@@ -408,11 +409,16 @@
             flex: 1;
             max-width: 100%;
             min-width: 280px;
+            height: 400px; /* Fixed height - matches container */
+            max-height: 400px; /* Prevent any stretching */
             overflow-y: auto;
             display: block;
-            min-height: auto;
-            height: auto;
             padding-bottom: 20px;
+        }
+
+        .content {
+            max-height: 100%;
+            overflow-y: auto;
         }
 
         .container {
