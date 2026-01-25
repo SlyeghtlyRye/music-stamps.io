@@ -525,18 +525,21 @@
         /* Mobile Responsive - Vertical Layout */
         @media (max-width: 768px) {
             body {
-                overflow-y: auto;
+                overflow: hidden; /* CHANGE from overflow-y: auto */
+                height: 100vh;
             }
 
             .viewport {
                 height: 100vh;
-                overflow: auto;
+                overflow: hidden;
             }
 
             .scene {
                 transform: translateY(0) !important;
                 position: relative;
-                min-height: 200vh;
+                min-height: 100vh; /* CHANGE from 200vh */
+                height: 100vh; /* ADD THIS */
+                overflow: hidden; /* ADD THIS */
             }
 
             .scene.projects-view {
@@ -561,13 +564,14 @@
 
             .player-area {
                 padding: 20px 10px;
-                height: auto;
-                min-height: unset; /* Remove min-height completely */
+                height: 100vh; /* CHANGE from auto */
+                min-height: 100vh; /* ADD THIS */
                 width: 100%;
                 display: flex;
-                align-items: flex-start; /* CHANGED from center to flex-start */
+                align-items: center; /* CHANGE from flex-start to center */
                 justify-content: center;
                 position: relative;
+                overflow: hidden; /* ADD THIS */
             }
 
             .container {
