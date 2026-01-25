@@ -227,6 +227,7 @@
         .nav-arrow.up {
             top: 40px;
             animation: bounceUp 2s infinite;
+            z-index: 50;
         }
 
         .nav-arrow.down {
@@ -582,10 +583,13 @@
                 padding: 0;
                 display: flex;
                 flex-direction: row;
-                align-items: flex-start; /* CHANGED from stretch to flex-start */
-                height: fit-content; /* CHANGED from auto to fit-content */
+                align-items: flex-start;
+                height: fit-content;
                 max-height: none;
-                min-height: unset; /* Remove min-height */
+                min-height: unset;
+                transform: translateY(0px);
+                position: relative; /* ADD THIS */
+                z-index: 100; /* ADD THIS - same or higher than the arrow */
             }
 
             .tabs-row {
@@ -696,6 +700,9 @@
 
             .nav-arrow.up {
                 top: 10px;
+                background: rgba(240, 240, 240, 0);
+                z-index: 150; /* CHANGE THIS - higher than container so it's clickable */
+                pointer-events: auto; /* ADD THIS to ensure it's clickable */
             }
 
             .nav-arrow.down {
