@@ -521,32 +521,43 @@
 
             .viewport {
                 height: 100vh;
-                overflow: hidden;
-                display: flex;
-                align-items: center;
-                justify-content: center;
+                overflow: auto;
             }
 
             .scene {
-                transform: none !important;
-                position: static;
-                height: 100%;
-                display: flex;
-                align-items: center;
-                justify-content: center;
+                transform: translateY(0) !important;
+                position: relative;
+                min-height: 200vh;
             }
 
             .scene.projects-view {
-                transform: none !important;
+                transform: translateY(-100vh) !important;
+            }
+
+            .chip-shelf {
+                margin-top: 0;
+                padding: 60px 20px 20px 20px;
+                height: 100vh;
+                position: relative;
+                display: flex;
+                flex-wrap: wrap;
+                align-items: flex-start;
+                justify-content: center;
+                gap: 20px;
+            }
+
+            .scene.projects-view .chip-shelf {
+                opacity: 1;
             }
 
             .player-area {
                 padding: 0 10px;
-                height: 100%;
+                height: 100vh;
                 width: 100%;
                 display: flex;
                 align-items: center;
                 justify-content: center;
+                position: relative;
             }
 
             .container {
@@ -557,8 +568,9 @@
                 display: flex;
                 flex-direction: row;
                 align-items: stretch;
-                height: 80vh;
-                max-height: 700px;
+                height: auto;
+                max-height: none;
+                min-height: 70vh;
             }
 
             .tabs-row {
@@ -579,6 +591,7 @@
                 border-left: none;
                 white-space: nowrap;
                 flex: 1;
+                min-height: 60px;
             }
 
             .tab.active {
@@ -588,7 +601,7 @@
             }
 
             .content-box {
-                padding: 20px 15px;
+                padding: 20px;
                 border: 3px solid #000;
                 border-right: none;
                 background: #fff;
@@ -600,15 +613,16 @@
                 display: flex;
                 flex-direction: column;
                 align-items: center;
-                justify-content: center;
+                justify-content: flex-start;
+                overflow-y: auto;
             }
 
             .chip-slot {
                 position: static !important;
                 transform: none !important;
                 width: 95%;
-                max-width: none;
-                margin: 0 auto 30px auto;
+                max-width: 400px;
+                margin: 20px auto;
                 height: auto;
                 min-height: 220px;
                 left: auto !important;
@@ -623,9 +637,9 @@
             .qr-display {
                 position: static !important;
                 transform: none !important;
-                width: 70%;
-                max-width: 250px;
-                margin: 0 auto;
+                width: 90%;
+                max-width: 300px;
+                margin: 20px auto;
                 height: auto;
                 left: auto !important;
                 top: auto !important;
@@ -637,17 +651,17 @@
             }
 
             .qr-display img {
-                width: 100px;
-                height: 100px;
+                width: 120px;
+                height: 120px;
             }
 
             .qr-display h3 {
-                font-size: 11px;
+                font-size: 12px;
             }
 
             .qr-download-btn {
-                font-size: 10px;
-                padding: 6px 10px;
+                font-size: 11px;
+                padding: 8px 12px;
             }
 
             .nav-arrow {
