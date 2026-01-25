@@ -398,11 +398,20 @@
         }
 
         .content-box {
-            background: #fff;
+            padding: 20px;
             border: 3px solid #000;
-            padding: 40px;
-            min-height: 400px;
+            border-right: none;
+            background: #fff;
             position: relative;
+            order: 1;
+            flex: 1;
+            max-width: 100%;
+            min-width: 280px;
+            overflow-y: auto;
+            display: block;
+            min-height: auto;
+            height: auto;
+            padding-bottom: 20px;
         }
 
         .container {
@@ -552,13 +561,15 @@
 
             .player-area {
                 padding: 0 10px;
-                height: auto;
-                min-height: 100vh; /* Add min-height instead */
+                height: auto; /* Keep this */
+                min-height: auto; /* CHANGED from 100vh to auto */
                 width: 100%;
                 display: flex;
                 align-items: center;
                 justify-content: center;
                 position: relative;
+                padding-top: 20px; /* Add some top padding */
+                padding-bottom: 20px; /* Add some bottom padding */
             }
 
             .container {
@@ -569,9 +580,9 @@
                 display: flex;
                 flex-direction: row;
                 align-items: stretch;
-                height: auto; /* Remove fixed height constraints */
+                height: auto;
                 max-height: none;
-                min-height: auto; /* Change from 70vh to auto */
+                min-height: auto;
             }
 
             .tabs-row {
@@ -686,10 +697,15 @@
 
             .chip-shelf {
                 margin-top: 0;
-                padding: 20px;
-                height: auto;
-                min-height: 60vh;
+                padding: 60px 20px 20px 20px;
+                height: auto; /* Keep this */
+                min-height: auto; /* CHANGED from 60vh to auto */
                 position: static;
+                display: flex;
+                flex-wrap: wrap;
+                align-items: flex-start;
+                justify-content: center;
+                gap: 20px;
             }
 
             .scene.projects-view .chip-shelf {
