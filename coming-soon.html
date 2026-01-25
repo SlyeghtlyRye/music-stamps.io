@@ -513,6 +513,117 @@
             background: #333;
         }
 
+        /* Mobile Responsive - Vertical Layout */
+        @media (max-width: 768px) {
+            .container {
+                max-width: 100%;
+                padding: 0 10px;
+            }
+
+            .content-box {
+                padding: 20px;
+                min-height: auto;
+            }
+
+            .chip-slot {
+                position: relative;
+                top: auto;
+                left: auto;
+                transform: none;
+                width: 100%;
+                max-width: 280px;
+                margin: 20px auto;
+            }
+
+            .qr-display {
+                position: relative;
+                top: auto;
+                left: auto;
+                transform: none;
+                width: 100%;
+                max-width: 200px;
+                margin: 20px auto;
+            }
+
+            .tab {
+                padding: 8px 12px;
+                font-size: 12px;
+            }
+
+            .nav-arrow {
+                font-size: 36px;
+            }
+
+            .nav-arrow.up {
+                top: 20px;
+            }
+
+            .nav-arrow.down {
+                bottom: 20px;
+            }
+
+            .chip-shelf {
+                margin-top: 0;
+                padding: 20px;
+                height: auto;
+                min-height: 300px;
+            }
+
+            .music-chip {
+                width: 80px;
+                height: 80px;
+                font-size: 10px;
+            }
+
+            .chip-label {
+                font-size: 9px;
+                width: 70px;
+            }
+
+            .add-song-btn {
+                top: 20px;
+                font-size: 36px;
+            }
+
+            .welcome-message {
+                font-size: 12px;
+                max-width: 90%;
+                text-align: center;
+            }
+
+            .welcome-message.lightbulb {
+                font-size: 20px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .tabs-row {
+                flex-wrap: wrap;
+            }
+
+            .tab {
+                flex: 1 1 45%;
+                padding: 8px 10px;
+                font-size: 11px;
+            }
+
+            .qr-display img {
+                width: 120px;
+                height: 120px;
+            }
+
+            .qr-display {
+                width: 180px;
+                height: 220px;
+                padding: 15px;
+            }
+
+            .chip-slot {
+                height: auto;
+                min-height: 250px;
+            }
+        }
+
         .loaded-chip {
             width: 100%;
             height: 100%;
