@@ -564,14 +564,15 @@
 
             .player-area {
                 padding: 20px 10px;
-                height: 100vh; /* CHANGE from auto */
-                min-height: 100vh; /* ADD THIS */
+                height: 100vh;
+                min-height: 100vh;
                 width: 100%;
                 display: flex;
-                align-items: center; /* CHANGE from flex-start to center */
+                align-items: flex-start; /* Raises it to the top */
                 justify-content: center;
                 position: relative;
-                overflow: hidden; /* ADD THIS */
+                overflow: hidden;
+                padding-top: 60px; /* ADD THIS - adjusts how high */
             }
 
             .container {
