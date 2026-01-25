@@ -610,48 +610,45 @@
                 flex: 1;
                 max-width: 100%;
                 min-width: 280px;
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                justify-content: flex-start;
                 overflow-y: auto;
             }
 
             .chip-slot {
-                position: static !important;
+                position: relative !important;
                 transform: none !important;
-                width: 95%;
-                max-width: 400px;
-                margin: 20px auto 0 auto;
+                width: 100%;
+                max-width: 100%;
+                margin: 0 !important;
                 height: auto;
                 min-height: 220px;
                 left: auto !important;
                 top: auto !important;
-                display: block;
+                display: block !important;
+                float: none !important;
             }
 
             .chip-slot.visible {
                 opacity: 1 !important;
                 pointer-events: auto;
-                display: block;
             }
 
             .qr-display {
-                position: static !important;
+                position: relative !important;
                 transform: none !important;
-                width: 90%;
-                max-width: 300px;
-                margin: 10px auto 20px auto;
+                width: 100%;
+                max-width: 100%;
+                margin: 20px 0 0 0 !important;
                 height: auto;
                 left: auto !important;
                 top: auto !important;
                 padding: 15px;
-                display: block;
+                display: block !important;
+                float: none !important;
+                clear: both !important;
             }
 
             .qr-display.visible {
                 opacity: 1 !important;
-                display: block;
             }
 
             .qr-display img {
