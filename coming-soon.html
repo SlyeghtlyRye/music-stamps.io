@@ -367,7 +367,7 @@
         .container {
             max-width: 800px;
             width: 100%;
-            height: 600px; /* Lock cassette height */
+            height: 400px; /* Lock cassette height */
         }
 
         .tabs-row {
@@ -590,13 +590,12 @@
                 display: flex;
                 flex-direction: row;
                 align-items: flex-start;
-                height: fit-content;
+                height: 500px; /* Change this to make it taller - try 500px, 600px, etc. */
                 max-height: none;
                 min-height: unset;
                 transform: translateY(20px);
-                position: relative; /* ADD THIS */
-                z-index: 100; /* ADD THIS - same or higher than the arrow */
-                
+                position: relative;
+                z-index: 100;
             }
 
             .tabs-row {
