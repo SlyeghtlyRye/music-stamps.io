@@ -1700,14 +1700,29 @@
         }
 
         function downloadQR() {
-            if (!currentChip || !currentChip.qr_code_url) return;
+            if (!currentChip) return;
             
-            const a = document.createElement('a');
-            a.href = currentChip.qr_code_url;
-            a.download = `${currentChip.name}-qr.svg`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
+            // Download QR Code SVG
+            if (currentChip.qr_code_url) {
+                const qrLink = document.createElement('a');
+                qrLink.href = currentChip.qr_code_url;
+                qrLink.download = `${currentChip.name}-qr.svg`;
+                document.body.appendChild(qrLink);
+                qrLink.click();
+                document.body.removeChild(qrLink);
+            }
+            
+            // Download STL file (slight delay so browser doesn't block)
+            if (currentChip.stl_url) {
+                setTimeout(() => {
+                    const stlLink = document.createElement('a');
+                    stlLink.href = currentChip.stl_url;
+                    stlLink.download = `${currentChip.name}-qr-3d.stl`;
+                    document.body.appendChild(stlLink);
+                    stlLink.click();
+                    document.body.removeChild(stlLink);
+                }, 100);
+            }
         }
 
         function playPause() {
