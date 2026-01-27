@@ -1720,11 +1720,18 @@
                     zip.file(`${currentChip.name}-qr.svg`, qrBlob);
                 }
                 
-                // Fetch and add 3MF (using stl_url property)
+                // Fetch and add STL
                 if (currentChip.stl_url) {
-                    const threemfResponse = await fetch(currentChip.stl_url);
+                    const stlResponse = await fetch(currentChip.stl_url);
+                    const stlBlob = await stlResponse.blob();
+                    zip.file(`${currentChip.name}-qr-3d.stl`, stlBlob);
+                }
+                
+                // Fetch and add 3MF
+                if (currentChip.threemf_url) {
+                    const threemfResponse = await fetch(currentChip.threemf_url);
                     const threemfBlob = await threemfResponse.blob();
-                    zip.file(`${currentChip.name}-qr-3d.3mf`, threemfBlob); // Changed extension to .3mf
+                    zip.file(`${currentChip.name}-qr-3d.3mf`, threemfBlob);
                 }
                 
                 // Generate and download ZIP
@@ -1745,6 +1752,7 @@
                 downloadBtn.disabled = false;
             }
         }
+
 
         function playPause() {
             if (!currentChip) return;
