@@ -1705,7 +1705,6 @@
         async function downloadQR() {
             if (!currentChip) return;
             
-            // Show loading state
             const downloadBtn = document.querySelector('.qr-download-btn');
             const originalText = downloadBtn.textContent;
             downloadBtn.textContent = 'Preparing...';
@@ -1721,11 +1720,11 @@
                     zip.file(`${currentChip.name}-qr.svg`, qrBlob);
                 }
                 
-                // Fetch and add STL
+                // Fetch and add 3MF (using stl_url property)
                 if (currentChip.stl_url) {
-                    const stlResponse = await fetch(currentChip.stl_url);
-                    const stlBlob = await stlResponse.blob();
-                    zip.file(`${currentChip.name}-qr-3d.stl`, stlBlob);
+                    const threemfResponse = await fetch(currentChip.stl_url);
+                    const threemfBlob = await threemfResponse.blob();
+                    zip.file(`${currentChip.name}-qr-3d.3mf`, threemfBlob); // Changed extension to .3mf
                 }
                 
                 // Generate and download ZIP
@@ -1746,7 +1745,6 @@
                 downloadBtn.disabled = false;
             }
         }
-
 
         function playPause() {
             if (!currentChip) return;
