@@ -1753,37 +1753,18 @@
             }, 1000);
         }
 
-
-        async function downloadQR() {
+        function downloadQR() {
             if (!currentChip || !currentChip.qr_code_url) return;
             
-            try {
-                // Fetch the SVG content
-                const response = await fetch(currentChip.qr_code_url);
-                const blob = await response.blob();
-                
-                // Create download link
-                const url = URL.createObjectURL(blob);
-                const link = document.createElement('a');
-                link.href = url;
-                link.download = `${currentChip.name}-qr.svg`;
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-                URL.revokeObjectURL(url);
-                
-            } catch (error) {
-                console.error('Download failed:', error);
-                // Fallback to direct link if fetch fails
-                const link = document.createElement('a');
-                link.href = currentChip.qr_code_url;
-                link.download = `${currentChip.name}-qr.svg`;
-                link.target = '_blank';
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-            }
-        }
+            const link = document.createElement('a');
+            link.href = currentChip.qr_code_url;
+            link.download = `${currentChip.name}-qr.svg`;
+            link.target = '_blank';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+}
+
 
         async function downloadSTL() {
             if (!currentChip || !currentChip.stl_url) return;
