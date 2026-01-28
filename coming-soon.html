@@ -1755,31 +1755,33 @@
 
 
         async function downloadQR() {
-            if (!currentChip) return;
-            
-            const downloadBtn = document.querySelector('.qr-download-btn');
-            const originalText = downloadBtn.textContent;
-            downloadBtn.textContent = 'Downloading...';
-            downloadBtn.disabled = true;
+            if (!currentChip || !currentChip.qr_code_url) return;
             
             try {
-                // Download QR SVG
-                if (currentChip.qr_code_url) {
-                    const link = document.createElement('a');
-                    link.href = currentChip.qr_code_url;
-                    link.download = `${currentChip.name}-qr.svg`;
-                    link.target = '_blank';
-                    document.body.appendChild(link);
-                    link.click();
-                    document.body.removeChild(link);
-                }
+                // Fetch the SVG content
+                const response = await fetch(currentChip.qr_code_url);
+                const blob = await response.blob();
+                
+                // Create download link
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = `${currentChip.name}-qr.svg`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(url);
                 
             } catch (error) {
                 console.error('Download failed:', error);
-                alert('Download failed. Please try again.');
-            } finally {
-                downloadBtn.textContent = originalText;
-                downloadBtn.disabled = false;
+                // Fallback to direct link if fetch fails
+                const link = document.createElement('a');
+                link.href = currentChip.qr_code_url;
+                link.download = `${currentChip.name}-qr.svg`;
+                link.target = '_blank';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
             }
         }
 
