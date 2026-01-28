@@ -551,6 +551,42 @@
             background: #333;
         }
 
+        .download-buttons {
+                display: flex;
+                gap: 8px;
+                justify-content: center;
+                margin-top: 10px;
+            }
+
+        .download-icon-btn {
+            width: 50px;
+            height: 50px;
+            background: #000;
+            color: #fff;
+            border: 2px solid #000;
+            cursor: pointer;
+            font-size: 10px;
+            font-weight: bold;
+            transition: all 0.2s;
+            font-family: 'Courier New', monospace;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            line-height: 1.2;
+        }
+
+        .download-icon-btn:hover {
+            background: #333;
+            transform: scale(1.05);
+        }
+
+        .download-icon-btn .icon {
+            font-size: 16px;
+            margin-bottom: 2px;
+        }
+
+
         /* Mobile Responsive - Vertical Layout */
         @media (max-width: 768px){
             body {
@@ -1680,9 +1716,20 @@
                     qrDisplay.innerHTML = `
                         <h3>QR Code Files</h3>
                         <img src="${song.qr_code_url}" alt="QR Code">
-                        <button class="qr-download-btn" onclick="downloadQR()">Download QR SVG</button>
-                        <button class="qr-download-btn" onclick="downloadSTL()">Download STL</button>
-                        <button class="qr-download-btn" onclick="download3MF()">Download 3MF</button>
+                        <div class="download-buttons">
+                            <button class="download-icon-btn" onclick="downloadQR()" title="Download QR SVG">
+                                <span class="icon">↓</span>
+                                <span>SVG</span>
+                            </button>
+                            <button class="download-icon-btn" onclick="downloadSTL()" title="Download STL">
+                                <span class="icon">↓</span>
+                                <span>STL</span>
+                            </button>
+                            <button class="download-icon-btn" onclick="download3MF()" title="Download 3MF">
+                                <span class="icon">↓</span>
+                                <span>3MF</span>
+                            </button>
+                        </div>
                     `;
                     qrDisplay.classList.add('visible');
                 } else {
