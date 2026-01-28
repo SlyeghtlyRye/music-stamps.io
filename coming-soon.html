@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
     <title>Music Stamps</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -1678,7 +1677,13 @@
 
                 // Show QR code if available (will be displayed since we're switching to PROJECTS)
                 if (song.qr_code_url) {
-                    qrImage.src = song.qr_code_url;
+                    qrDisplay.innerHTML = `
+                        <h3>QR Code Files</h3>
+                        <img src="${song.qr_code_url}" alt="QR Code">
+                        <button class="qr-download-btn" onclick="downloadQR()">Download QR SVG</button>
+                        <button class="qr-download-btn" onclick="downloadSTL()">Download STL</button>
+                        <button class="qr-download-btn" onclick="download3MF()">Download 3MF</button>
+                    `;
                     qrDisplay.classList.add('visible');
                 } else {
                     qrDisplay.classList.remove('visible');
@@ -1707,42 +1712,20 @@
             
             const downloadBtn = document.querySelector('.qr-download-btn');
             const originalText = downloadBtn.textContent;
-            downloadBtn.textContent = 'Preparing...';
+            downloadBtn.textContent = 'Downloading...';
             downloadBtn.disabled = true;
             
             try {
-                const zip = new JSZip();
-                
-                // Fetch and add QR SVG
+                // Download QR SVG
                 if (currentChip.qr_code_url) {
-                    const qrResponse = await fetch(currentChip.qr_code_url);
-                    const qrBlob = await qrResponse.blob();
-                    zip.file(`${currentChip.name}-qr.svg`, qrBlob);
+                    const link = document.createElement('a');
+                    link.href = currentChip.qr_code_url;
+                    link.download = `${currentChip.name}-qr.svg`;
+                    link.target = '_blank';
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
                 }
-                
-                // Fetch and add STL
-                if (currentChip.stl_url) {
-                    const stlResponse = await fetch(currentChip.stl_url);
-                    const stlBlob = await stlResponse.blob();
-                    zip.file(`${currentChip.name}-qr-3d.stl`, stlBlob);
-                }
-                
-                // Fetch and add 3MF
-                if (currentChip.threemf_url) {
-                    const threemfResponse = await fetch(currentChip.threemf_url);
-                    const threemfBlob = await threemfResponse.blob();
-                    zip.file(`${currentChip.name}-qr-3d.3mf`, threemfBlob);
-                }
-                
-                // Generate and download ZIP
-                const zipBlob = await zip.generateAsync({ type: 'blob' });
-                const link = document.createElement('a');
-                link.href = URL.createObjectURL(zipBlob);
-                link.download = `${currentChip.name}-qr-files.zip`;
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-                URL.revokeObjectURL(link.href);
                 
             } catch (error) {
                 console.error('Download failed:', error);
@@ -1753,6 +1736,29 @@
             }
         }
 
+        async function downloadSTL() {
+            if (!currentChip || !currentChip.stl_url) return;
+            
+            const link = document.createElement('a');
+            link.href = currentChip.stl_url;
+            link.download = `${currentChip.name}-qr-3d.stl`;
+            link.target = '_blank';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        async function download3MF() {
+            if (!currentChip || !currentChip.threemf_url) return;
+            
+            const link = document.createElement('a');
+            link.href = currentChip.threemf_url;
+            link.download = `${currentChip.name}-qr-3d.3mf`;
+            link.target = '_blank';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
 
         function playPause() {
             if (!currentChip) return;
