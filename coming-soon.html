@@ -482,19 +482,17 @@
             right: 0%;
             top: 45%;
             transform: translate(-50%, -50%);
-            width: auto;
-            max-width: 200px;
-            height: auto;
-            padding: 5px;
+            width: 300px; /* Match chip-slot width */
+            height: 280px; /* Match chip-slot height */
+            padding: 10px;
             display: flex;
             flex-direction: column;
             align-items: center;
             opacity: 0;
             pointer-events: none;
-            border: 3px dashed #ccc; /* Add placeholder border */
-            background: #fff; /* Add background */
-            min-height: 280px; /* Match chip slot height */
-            min-width: 200px; /* Set minimum width */
+            border: 3px dashed #ccc;
+            background: #fff;
+            justify-content: space-between; /* Changed */
         }
 
         .qr-display.visible {
@@ -503,6 +501,98 @@
             border-color: #000; /* Solid border when visible */
             border-style: solid; /* Solid border when visible */
         }
+
+        /* Carousel container */
+        .carousel-container {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .carousel-content {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+        }
+
+        .carousel-item {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+        }
+
+        .carousel-item.active {
+            display: flex;
+        }
+
+        .carousel-nav {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: #000;
+            color: #fff;
+            border: 2px solid #000;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            z-index: 10;
+            transition: all 0.2s;
+        }
+
+        .carousel-nav:hover {
+            background: #333;
+            transform: translateY(-50%) scale(1.1);
+        }
+
+        .carousel-nav.prev {
+            left: 5px;
+        }
+
+        .carousel-nav.next {
+            right: 5px;
+        }
+
+        .carousel-item img {
+            max-width: 150px;
+            max-height: 150px;
+            border: 2px solid #000;
+        }
+
+        .placeholder {
+            width: 150px;
+            height: 150px;
+            background: #f0f0f0;
+            border: 2px dashed #999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            color: #666;
+            text-align: center;
+            padding: 10px;
+        }
+
+        .qr-display h3 {
+            font-size: 12px;
+            margin: 0;
+            text-align: center;
+        }
+
+
 
         /* Show QR placeholder when PROJECTS tab is active */
         .tab.active:nth-child(2) ~ .content-box .qr-display {
@@ -1714,8 +1804,25 @@
                 // Show QR code if available (will be displayed since we're switching to PROJECTS)
                 if (song.qr_code_url) {
                     qrDisplay.innerHTML = `
-                        <h3>QR Code Files</h3>
-                        <img src="${song.qr_code_url}" alt="QR Code">
+                        <h3>Media Gallery</h3>
+                        <div class="carousel-container">
+                            <button class="carousel-nav prev" onclick="prevCarouselItem()">‹</button>
+                            <div class="carousel-content">
+                                <div class="carousel-item active" data-index="0">
+                                    <img src="${song.qr_code_url}" alt="QR Code">
+                                    <h3 style="margin-top: 10px;">QR Code</h3>
+                                </div>
+                                <div class="carousel-item" data-index="1">
+                                    <div class="placeholder">Album Art<br>(Coming Soon)</div>
+                                    <h3 style="margin-top: 10px;">Album Art</h3>
+                                </div>
+                                <div class="carousel-item" data-index="2">
+                                    <div class="placeholder">3D Model<br>(Coming Soon)</div>
+                                    <h3 style="margin-top: 10px;">3D Preview</h3>
+                                </div>
+                            </div>
+                            <button class="carousel-nav next" onclick="nextCarouselItem()">›</button>
+                        </div>
                         <div class="download-buttons">
                             <button class="download-icon-btn" onclick="downloadQR()" title="Download QR SVG">
                                 <span class="icon">↓</span>
@@ -1913,6 +2020,26 @@
             const secs = Math.floor(seconds % 60);
             return `${mins}:${secs.toString().padStart(2, '0')}`;
         }
+
+        let currentCarouselIndex = 0;
+        function nextCarouselItem() {
+            const items = document.querySelectorAll('.carousel-item');
+            if (items.length === 0) return;
+            
+            items[currentCarouselIndex].classList.remove('active');
+            currentCarouselIndex = (currentCarouselIndex + 1) % items.length;
+            items[currentCarouselIndex].classList.add('active');
+        }
+
+        function prevCarouselItem() {
+            const items = document.querySelectorAll('.carousel-item');
+            if (items.length === 0) return;
+            
+            items[currentCarouselIndex].classList.remove('active');
+            currentCarouselIndex = (currentCarouselIndex - 1 + items.length) % items.length;
+            items[currentCarouselIndex].classList.add('active');
+        }
+
     </script>
 </body>
 </html>
