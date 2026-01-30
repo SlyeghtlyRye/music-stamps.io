@@ -2139,7 +2139,8 @@
                 0.1,
                 1000
             );
-            camera.position.set(0, 0, 100);
+            camera.position.set(0, 0, 80);
+
             
             // Renderer setup
             const renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -2238,8 +2239,10 @@
                     const size = new THREE.Vector3();
                     geometry.boundingBox.getSize(size);
                     const maxDim = Math.max(size.x, size.y, size.z);
-                    const scale = 50 / maxDim;
+                    const scale = 40 / maxDim; // Reduced from 50
                     mesh.scale.setScalar(scale);
+
+                    scene.add(mesh);
                     // Animation loop with rotation control
                     let animationId;
                     function animate() {
