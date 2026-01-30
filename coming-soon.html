@@ -2268,29 +2268,32 @@
                 });
         }
 
-
         function parseSTL(buffer) {
             const view = new DataView(buffer);
-            let isASCII = true;
             
-            // Check if binary STL
-            for (let i = 0; i < 5; i++) {
-                if (view.getUint8(i) === 0) {
-                    isASCII = false;
-                    break;
+            // Binary STL check: first 5 bytes should not spell "solid" (ASCII marker)
+            const header = new TextDecoder().decode(buffer.slice(0, 5));
+            
+            if (header === 'solid') {
+                // Might be ASCII, but verify
+                const text = new TextDecoder().decode(buffer);
+                if (text.includes('facet') && text.includes('vertex')) {
+                    console.log('Detected ASCII STL');
+                    return parseASCIISTL(buffer);
                 }
             }
             
-            if (isASCII) {
-                return parseASCIISTL(buffer);
-            } else {
-                return parseBinarySTL(buffer);
-            }
+            // Default to binary
+            console.log('Detected Binary STL');
+            return parseBinarySTL(buffer);
         }
+
 
         function parseBinarySTL(buffer) {
             const view = new DataView(buffer);
             const triangles = view.getUint32(80, true);
+            
+            console.log('Binary STL triangles:', triangles);
             
             const geometry = new THREE.BufferGeometry();
             const vertices = [];
@@ -2318,11 +2321,14 @@
                 offset += 2; // Skip attribute byte count
             }
             
+            console.log('Parsed vertices:', vertices.length / 3);
+            
             geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
             geometry.setAttribute('normal', new THREE.Float32BufferAttribute(normals, 3));
             
             return geometry;
         }
+
 
         function parseASCIISTL(buffer) {
             const text = new TextDecoder().decode(buffer);
