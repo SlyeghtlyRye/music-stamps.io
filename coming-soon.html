@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <title>Music Stamps</title>
     <style>
         * {
@@ -587,6 +587,39 @@
             text-align: center;
             padding: 10px;
         }
+
+
+        .model-viewer-container {
+            width: 160px;
+            height: 160px;
+            border: 2px solid #000;
+            background: #f0f0f0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .model-viewer-canvas {
+            width: 100% !important;
+            height: 100% !important;
+            display: block;
+        }
+
+        .model-loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 10px;
+            color: #666;
+            text-align: center;
+        }
+
+        .qr-display h3 {
+            font-size: 12px;
+            margin: 0;
+            text-align: center;
+        }
+
 
         .qr-display h3 {
             font-size: 12px;
@@ -1806,15 +1839,17 @@
                             <div class="carousel-content">
                                 <div class="carousel-item active" data-index="0">
                                     <img src="${song.qr_code_url}" alt="QR Code">
-                                    <h3 style="margin-top: 10px;">QR Code</h3>
+                                    <h3>QR Code</h3>
                                 </div>
                                 <div class="carousel-item" data-index="1">
                                     <div class="placeholder">Album Art<br>(Coming Soon)</div>
-                                    <h3 style="margin-top: 10px;">Album Art</h3>
+                                    <h3>Album Art</h3>
                                 </div>
                                 <div class="carousel-item" data-index="2">
-                                    <div class="placeholder">3D Model<br>(Coming Soon)</div>
-                                    <h3 style="margin-top: 10px;">3D Preview</h3>
+                                    <div class="model-viewer-container" id="modelViewer">
+                                        <div class="model-loading">Loading 3D Model...</div>
+                                    </div>
+                                    <h3>3D Preview</h3>
                                 </div>
                             </div>
                             <button class="carousel-nav next" onclick="nextCarouselItem()">›</button>
@@ -1835,10 +1870,18 @@
                         </div>
                     `;
                     qrDisplay.classList.add('visible');
+                    
+                    // Initialize 3D viewer after carousel is added to DOM
+                    if (song.stl_url) {
+                        setTimeout(() => init3DViewer(song.stl_url), 100);
+                    }
                 } else {
                     qrDisplay.classList.remove('visible');
                 }
-                
+            
+
+
+
                 scene.classList.remove('projects-view');
                 upArrow.classList.add('visible');
                 downArrow.classList.remove('visible');
@@ -2018,23 +2061,238 @@
         }
 
         let currentCarouselIndex = 0;
+
         function nextCarouselItem() {
             const items = document.querySelectorAll('.carousel-item');
             if (items.length === 0) return;
             
+            // Clean up 3D viewer if leaving that slide
+            if (currentCarouselIndex === 2 && viewer3D) {
+                viewer3D.dispose();
+                viewer3D = null;
+            }
+            
             items[currentCarouselIndex].classList.remove('active');
             currentCarouselIndex = (currentCarouselIndex + 1) % items.length;
             items[currentCarouselIndex].classList.add('active');
+            
+            // Reinitialize 3D viewer if entering that slide
+            if (currentCarouselIndex === 2 && currentChip && currentChip.stl_url) {
+                setTimeout(() => init3DViewer(currentChip.stl_url), 100);
+            }
         }
 
         function prevCarouselItem() {
             const items = document.querySelectorAll('.carousel-item');
             if (items.length === 0) return;
             
+            // Clean up 3D viewer if leaving that slide
+            if (currentCarouselIndex === 2 && viewer3D) {
+                viewer3D.dispose();
+                viewer3D = null;
+            }
+            
             items[currentCarouselIndex].classList.remove('active');
             currentCarouselIndex = (currentCarouselIndex - 1 + items.length) % items.length;
             items[currentCarouselIndex].classList.add('active');
+            
+            // Reinitialize 3D viewer if entering that slide
+            if (currentCarouselIndex === 2 && currentChip && currentChip.stl_url) {
+                setTimeout(() => init3DViewer(currentChip.stl_url), 100);
+            }
         }
+
+        let viewer3D = null;
+
+        function init3DViewer(stlUrl) {
+            const container = document.getElementById('modelViewer');
+            if (!container) return;
+            
+            // Clear any existing viewer
+            if (viewer3D) {
+                viewer3D.dispose();
+                viewer3D = null;
+            }
+            
+            // Scene setup
+            const scene = new THREE.Scene();
+            scene.background = new THREE.Color(0xf0f0f0);
+            
+            // Camera setup
+            const camera = new THREE.PerspectiveCamera(
+                45,
+                container.clientWidth / container.clientHeight,
+                0.1,
+                1000
+            );
+            camera.position.set(0, 0, 100);
+            
+            // Renderer setup
+            const renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setSize(container.clientWidth, container.clientHeight);
+            renderer.setPixelRatio(window.devicePixelRatio);
+            container.innerHTML = '';
+            container.appendChild(renderer.domElement);
+            renderer.domElement.className = 'model-viewer-canvas';
+            
+            // Lighting
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+            scene.add(ambientLight);
+            
+            const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+            directionalLight.position.set(1, 1, 1);
+            scene.add(directionalLight);
+            
+            // Load STL
+            loadSTLModel(stlUrl, scene, camera, renderer, container);
+            
+            // Store viewer for cleanup
+            viewer3D = { scene, camera, renderer, container };
+        }
+
+        function loadSTLModel(url, scene, camera, renderer, container) {
+            // Simple STL loader implementation
+            fetch(url)
+                .then(response => response.arrayBuffer())
+                .then(buffer => {
+                    const geometry = parseSTL(buffer);
+                    const material = new THREE.MeshPhongMaterial({
+                        color: 0x000000,
+                        specular: 0x111111,
+                        shininess: 200
+                    });
+                    
+                    const mesh = new THREE.Mesh(geometry, material);
+                    
+                    // Center and scale the model
+                    geometry.computeBoundingBox();
+                    const center = new THREE.Vector3();
+                    geometry.boundingBox.getCenter(center);
+                    mesh.position.sub(center);
+                    
+                    const size = new THREE.Vector3();
+                    geometry.boundingBox.getSize(size);
+                    const maxDim = Math.max(size.x, size.y, size.z);
+                    const scale = 50 / maxDim;
+                    mesh.scale.setScalar(scale);
+                    
+                    scene.add(mesh);
+                    
+                    // Animation loop
+                    let animationId;
+                    function animate() {
+                        animationId = requestAnimationFrame(animate);
+                        mesh.rotation.z += 0.005;
+                        renderer.render(scene, camera);
+                    }
+                    animate();
+                    
+                    // Store animation ID for cleanup
+                    viewer3D.animationId = animationId;
+                    viewer3D.dispose = function() {
+                        if (animationId) cancelAnimationFrame(animationId);
+                        if (renderer) renderer.dispose();
+                        if (geometry) geometry.dispose();
+                        if (material) material.dispose();
+                    };
+                })
+                .catch(error => {
+                    console.error('Error loading STL:', error);
+                    container.innerHTML = '<div class="model-loading">Failed to load model</div>';
+                });
+        }
+
+        function parseSTL(buffer) {
+            const view = new DataView(buffer);
+            const isASCII = true;
+            
+            // Check if binary STL
+            for (let i = 0; i < 5; i++) {
+                if (view.getUint8(i) === 0) {
+                    isASCII = false;
+                    break;
+                }
+            }
+            
+            if (isASCII) {
+                return parseASCIISTL(buffer);
+            } else {
+                return parseBinarySTL(buffer);
+            }
+        }
+
+        function parseBinarySTL(buffer) {
+            const view = new DataView(buffer);
+            const triangles = view.getUint32(80, true);
+            
+            const geometry = new THREE.BufferGeometry();
+            const vertices = [];
+            const normals = [];
+            
+            let offset = 84;
+            for (let i = 0; i < triangles; i++) {
+                // Normal
+                const nx = view.getFloat32(offset, true);
+                const ny = view.getFloat32(offset + 4, true);
+                const nz = view.getFloat32(offset + 8, true);
+                offset += 12;
+                
+                // Vertices
+                for (let j = 0; j < 3; j++) {
+                    vertices.push(
+                        view.getFloat32(offset, true),
+                        view.getFloat32(offset + 4, true),
+                        view.getFloat32(offset + 8, true)
+                    );
+                    normals.push(nx, ny, nz);
+                    offset += 12;
+                }
+                
+                offset += 2; // Skip attribute byte count
+            }
+            
+            geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
+            geometry.setAttribute('normal', new THREE.Float32BufferAttribute(normals, 3));
+            
+            return geometry;
+        }
+
+        function parseASCIISTL(buffer) {
+            const text = new TextDecoder().decode(buffer);
+            const geometry = new THREE.BufferGeometry();
+            const vertices = [];
+            const normals = [];
+            
+            const lines = text.split('\n');
+            let currentNormal = [0, 0, 0];
+            
+            for (let line of lines) {
+                line = line.trim();
+                
+                if (line.startsWith('facet normal')) {
+                    const parts = line.split(/\s+/);
+                    currentNormal = [
+                        parseFloat(parts[2]),
+                        parseFloat(parts[3]),
+                        parseFloat(parts[4])
+                    ];
+                } else if (line.startsWith('vertex')) {
+                    const parts = line.split(/\s+/);
+                    vertices.push(
+                        parseFloat(parts[1]),
+                        parseFloat(parts[2]),
+                        parseFloat(parts[3])
+                    );
+                    normals.push(...currentNormal);
+                }
+            }
+            
+            geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
+            geometry.setAttribute('normal', new THREE.Float32BufferAttribute(normals, 3));
+            
+            return geometry;
+        }
+
 
     </script>
 </body>
