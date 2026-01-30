@@ -2400,6 +2400,92 @@
                 });
         }
 
+        function loadSTLModelFullscreen(url, scene, camera, renderer, container, rotation) {
+            console.log('Fetching STL from:', url);
+            
+            fetch(url)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('HTTP error! status: ' + response.status);
+                    }
+                    return response.arrayBuffer();
+                })
+                .then(buffer => {
+                    const geometry = parseSTL(buffer);
+                    
+                    // Same color logic as regular viewer
+                    const positions = geometry.attributes.position;
+                    const colors = [];
+                    let maxZ = -Infinity;
+                    let minZ = Infinity;
+
+                    for (let i = 0; i < positions.count; i++) {
+                        const z = positions.getZ(i);
+                        maxZ = Math.max(maxZ, z);
+                        minZ = Math.min(minZ, z);
+                    }
+
+                    const topLayerThreshold = maxZ - (maxZ - minZ) * 0.2;
+
+                    for (let i = 0; i < positions.count; i++) {
+                        const z = positions.getZ(i);
+                        if (z >= topLayerThreshold) {
+                            colors.push(0.0, 0.0, 0.0); // Black top
+                        } else {
+                            colors.push(1.0, 1.0, 1.0); // White base
+                        }
+                    }
+
+                    geometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
+
+                    const material = new THREE.MeshPhongMaterial({
+                        vertexColors: true,
+                        specular: 0x111111,
+                        shininess: 200
+                    });
+                    
+                    const mesh = new THREE.Mesh(geometry, material);
+                    
+                    geometry.computeBoundingBox();
+                    const box = geometry.boundingBox;
+                    const center = new THREE.Vector3();
+                    box.getCenter(center);
+
+                    geometry.translate(-center.x, -center.y, -center.z);
+
+                    const size = new THREE.Vector3();
+                    box.getSize(size);
+                    const maxDim = Math.max(size.x, size.y, size.z);
+                    const scale = 40 / maxDim;
+                    mesh.scale.setScalar(scale);
+
+                    mesh.position.set(0, 0, 0);
+                    scene.add(mesh);
+                    
+                    let animationId;
+                    function animate() {
+                        animationId = requestAnimationFrame(animate);
+                        mesh.rotation.x = rotation.x;
+                        mesh.rotation.y = rotation.y;
+                        renderer.render(scene, camera);
+                    }
+                    animate();
+                    
+                    viewer3DFullscreen.animationId = animationId;
+                    viewer3DFullscreen.dispose = function() {
+                        if (animationId) cancelAnimationFrame(animationId);
+                        if (renderer) renderer.dispose();
+                        if (geometry) geometry.dispose();
+                        if (material) material.dispose();
+                    };
+                })
+                .catch(error => {
+                    console.error('Error loading STL:', error);
+                    container.innerHTML = '<div class="model-loading">Failed to load model</div>';
+                });
+        }
+
+
         function parseSTL(buffer) {
             const view = new DataView(buffer);
             
@@ -2513,22 +2599,22 @@
             }, 100);
         }
 
-        function closeModelFullscreen() {
-            const modal = document.getElementById('modelFullscreenModal');
-            modal.classList.remove('active');
-            
-            // Clean up fullscreen viewer
-            if (viewer3DFullscreen) {
-                viewer3DFullscreen.dispose();
-                viewer3DFullscreen = null;
+            function closeModelFullscreen() {
+                const modal = document.getElementById('modelFullscreenModal');
+                modal.classList.remove('active');
+                
+                // Clean up fullscreen viewer - check if it exists first
+                if (viewer3DFullscreen && viewer3DFullscreen.dispose) {
+                    viewer3DFullscreen.dispose();
+                    viewer3DFullscreen = null;
+                }
             }
-        }
 
         let viewer3DFullscreen = null;
 
         function init3DViewerFullscreen(stlUrl, container) {
             // Clean up any existing viewer
-            if (viewer3DFullscreen) {
+            if (viewer3DFullscreen && viewer3DFullscreen.dispose) {
                 viewer3DFullscreen.dispose();
                 viewer3DFullscreen = null;
             }
