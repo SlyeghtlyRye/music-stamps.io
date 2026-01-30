@@ -2193,11 +2193,47 @@
             
             renderer.domElement.addEventListener('wheel', (e) => {
                 e.preventDefault();
-                zoom += e.deltaY * -0.1;
+                zoom += e.deltaY * 0.1;
                 zoom = Math.max(20, Math.min(200, zoom)); // Limit zoom range
                 camera.position.z = zoom;
             });
             
+            // Middle mouse button panning
+            let isPanning = false;
+            let panStart = { x: 0, y: 0 };
+
+            renderer.domElement.addEventListener('mousedown', (e) => {
+                if (e.button === 1) { // Middle mouse button
+                    isPanning = true;
+                    panStart = { x: e.clientX, y: e.clientY };
+                    e.preventDefault();
+                }
+            });
+
+            renderer.domElement.addEventListener('mousemove', (e) => {
+                if (isPanning) {
+                    const deltaX = e.clientX - panStart.x;
+                    const deltaY = e.clientY - panStart.y;
+                    
+                    camera.position.x += deltaX * 0.1;
+                    camera.position.y -= deltaY * 0.1; // Negative for natural direction
+                    
+                    panStart = { x: e.clientX, y: e.clientY };
+                }
+            });
+
+            renderer.domElement.addEventListener('mouseup', (e) => {
+                if (e.button === 1) {
+                    isPanning = false;
+                }
+            });
+
+            // Prevent context menu on middle click
+            renderer.domElement.addEventListener('contextmenu', (e) => {
+                e.preventDefault();
+            });
+
+
             // Load STL
             loadSTLModel(stlUrl, scene, camera, renderer, container, rotation);
             
