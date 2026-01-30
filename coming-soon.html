@@ -1831,7 +1831,7 @@
                     </div>
                 `;
 
-                
+
                 // Show QR code if available (will be displayed since we're switching to PROJECTS)
                 if (song.qr_code_url) {
                     console.log('Song STL URL:', song.stl_url); // DEBUG LINE
@@ -2108,7 +2108,9 @@
         let viewer3D = null;
 
         function init3DViewer(stlUrl) {
+            console.log('init3DViewer called with:', stlUrl);
             const container = document.getElementById('modelViewer');
+            console.log('Container found:', container);
             if (!container) return;
             
             // Clear any existing viewer
@@ -2116,6 +2118,15 @@
                 viewer3D.dispose();
                 viewer3D = null;
             }
+            
+            // Check if THREE is available
+            if (typeof THREE === 'undefined') {
+                console.error('THREE.js not loaded!');
+                container.innerHTML = '<div class="model-loading">THREE.js not loaded</div>';
+                return;
+            }
+            
+            console.log('THREE.js loaded, creating scene...');
             
             // Scene setup
             const scene = new THREE.Scene();
@@ -2138,6 +2149,8 @@
             container.appendChild(renderer.domElement);
             renderer.domElement.className = 'model-viewer-canvas';
             
+            console.log('Scene created, loading STL...');
+            
             // Lighting
             const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
             scene.add(ambientLight);
@@ -2146,19 +2159,68 @@
             directionalLight.position.set(1, 1, 1);
             scene.add(directionalLight);
             
+            // ADD SIMPLE MOUSE CONTROLS
+            let isDragging = false;
+            let previousMousePosition = { x: 0, y: 0 };
+            let rotation = { x: 0, y: 0 };
+            let zoom = 100;
+            
+            renderer.domElement.addEventListener('mousedown', (e) => {
+                isDragging = true;
+                previousMousePosition = { x: e.offsetX, y: e.offsetY };
+            });
+            
+            renderer.domElement.addEventListener('mousemove', (e) => {
+                if (isDragging) {
+                    const deltaX = e.offsetX - previousMousePosition.x;
+                    const deltaY = e.offsetY - previousMousePosition.y;
+                    
+                    rotation.y += deltaX * 0.01;
+                    rotation.x += deltaY * 0.01;
+                    
+                    previousMousePosition = { x: e.offsetX, y: e.offsetY };
+                }
+            });
+            
+            renderer.domElement.addEventListener('mouseup', () => {
+                isDragging = false;
+            });
+            
+            renderer.domElement.addEventListener('mouseleave', () => {
+                isDragging = false;
+            });
+            
+            renderer.domElement.addEventListener('wheel', (e) => {
+                e.preventDefault();
+                zoom += e.deltaY * -0.1;
+                zoom = Math.max(20, Math.min(200, zoom)); // Limit zoom range
+                camera.position.z = zoom;
+            });
+            
             // Load STL
-            loadSTLModel(stlUrl, scene, camera, renderer, container);
+            loadSTLModel(stlUrl, scene, camera, renderer, container, rotation);
             
             // Store viewer for cleanup
             viewer3D = { scene, camera, renderer, container };
         }
 
-        function loadSTLModel(url, scene, camera, renderer, container) {
-            // Simple STL loader implementation
+
+        function loadSTLModel(url, scene, camera, renderer, container, rotation) {
+            console.log('Fetching STL from:', url);
+            
             fetch(url)
-                .then(response => response.arrayBuffer())
+                .then(response => {
+                    console.log('Fetch response:', response.status);
+                    if (!response.ok) {
+                        throw new Error('HTTP error! status: ' + response.status);
+                    }
+                    return response.arrayBuffer();
+                })
                 .then(buffer => {
+                    console.log('Buffer received, size:', buffer.byteLength);
                     const geometry = parseSTL(buffer);
+                    console.log('Geometry parsed, vertices:', geometry.attributes.position.count);
+                    
                     const material = new THREE.MeshPhongMaterial({
                         color: 0x000000,
                         specular: 0x111111,
@@ -2181,11 +2243,12 @@
                     
                     scene.add(mesh);
                     
-                    // Animation loop
+                    // Animation loop with rotation control
                     let animationId;
                     function animate() {
                         animationId = requestAnimationFrame(animate);
-                        mesh.rotation.z += 0.005;
+                        mesh.rotation.x = rotation.x;
+                        mesh.rotation.y = rotation.y;
                         renderer.render(scene, camera);
                     }
                     animate();
@@ -2205,25 +2268,70 @@
                 });
         }
 
-        function parseSTL(buffer) {
-            const view = new DataView(buffer);
-            const isASCII = true;
-            
-            // Check if binary STL
-            for (let i = 0; i < 5; i++) {
-                if (view.getUint8(i) === 0) {
-                    isASCII = false;
-                    break;
-                }
-            }
-            
-            if (isASCII) {
-                return parseASCIISTL(buffer);
-            } else {
-                return parseBinarySTL(buffer);
-            }
-        }
 
+        function loadSTLModel(url, scene, camera, renderer, container, rotation) {
+            console.log('Fetching STL from:', url);
+            
+            // Simple STL loader implementation
+            fetch(url)
+                .then(response => {
+                    console.log('Fetch response:', response.status);
+                    if (!response.ok) {
+                        throw new Error('HTTP error! status: ' + response.status);
+                    }
+                    return response.arrayBuffer();
+                })
+                .then(buffer => {
+                    console.log('Buffer received, size:', buffer.byteLength);
+                    const geometry = parseSTL(buffer);
+                    console.log('Geometry parsed, vertices:', geometry.attributes.position.count);
+                    
+                    const material = new THREE.MeshPhongMaterial({
+                        color: 0x000000,
+                        specular: 0x111111,
+                        shininess: 200
+                    });
+                    
+                    const mesh = new THREE.Mesh(geometry, material);
+                    
+                    // Center and scale the model
+                    geometry.computeBoundingBox();
+                    const center = new THREE.Vector3();
+                    geometry.boundingBox.getCenter(center);
+                    mesh.position.sub(center);
+                    
+                    const size = new THREE.Vector3();
+                    geometry.boundingBox.getSize(size);
+                    const maxDim = Math.max(size.x, size.y, size.z);
+                    const scale = 50 / maxDim;
+                    mesh.scale.setScalar(scale);
+                    
+                    scene.add(mesh);
+                    
+                    // Animation loop with rotation control
+                    let animationId;
+                    function animate() {
+                        animationId = requestAnimationFrame(animate);
+                        mesh.rotation.x = rotation.x;
+                        mesh.rotation.y = rotation.y;
+                        renderer.render(scene, camera);
+                    }
+                    animate();
+                    
+                    // Store animation ID for cleanup
+                    viewer3D.animationId = animationId;
+                    viewer3D.dispose = function() {
+                        if (animationId) cancelAnimationFrame(animationId);
+                        if (renderer) renderer.dispose();
+                        if (geometry) geometry.dispose();
+                        if (material) material.dispose();
+                    };
+                })
+                .catch(error => {
+                    console.error('Error loading STL:', error);
+                    container.innerHTML = '<div class="model-loading">Failed to load model</div>';
+                });
+}
         function parseBinarySTL(buffer) {
             const view = new DataView(buffer);
             const triangles = view.getUint32(80, true);
