@@ -2223,7 +2223,7 @@
                     console.log('Geometry parsed, vertices:', geometry.attributes.position.count);
                     
                     const material = new THREE.MeshPhongMaterial({
-                        color: 0x808080,
+                        color: 0x323232,
                         specular: 0x111111,
                         shininess: 200
                     });
@@ -2232,19 +2232,21 @@
                     
                     // Center and scale the model
                     geometry.computeBoundingBox();
+                    const box = geometry.boundingBox;
                     const center = new THREE.Vector3();
-                    geometry.boundingBox.getCenter(center);
-                    mesh.position.sub(center);
-                    
-                    // Adjust position (positive X = right, positive Y = up, positive Z = towards camera)
-                    mesh.position.x += 30;  // Move right (increase for more right)
-                    mesh.position.y += 30;  // Move up (increase for more up)
+                    box.getCenter(center);
+
+                    // Center the geometry itself (not the mesh position)
+                    geometry.translate(-center.x, -center.y, -center.z);
 
                     const size = new THREE.Vector3();
-                    geometry.boundingBox.getSize(size);
+                    box.getSize(size);
                     const maxDim = Math.max(size.x, size.y, size.z);
-                    const scale = 40 / maxDim; // Reduced from 50
+                    const scale = 40 / maxDim;
                     mesh.scale.setScalar(scale);
+
+                    // Now adjust visual position AFTER geometry is centered
+                    mesh.position.set(30, 30, 0);  // Your right/up adjustments
 
                     scene.add(mesh);
                     // Animation loop with rotation control
