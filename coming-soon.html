@@ -1831,8 +1831,11 @@
                     </div>
                 `;
 
+                
                 // Show QR code if available (will be displayed since we're switching to PROJECTS)
                 if (song.qr_code_url) {
+                    console.log('Song STL URL:', song.stl_url); // DEBUG LINE
+                    
                     qrDisplay.innerHTML = `
                         <div class="carousel-container">
                             <button class="carousel-nav prev" onclick="prevCarouselItem()">‹</button>
@@ -1873,12 +1876,12 @@
                     
                     // Initialize 3D viewer after carousel is added to DOM
                     if (song.stl_url) {
+                        console.log('Initializing 3D viewer...'); // DEBUG LINE
                         setTimeout(() => init3DViewer(song.stl_url), 100);
+                    } else {
+                        console.log('No STL URL found!'); // DEBUG LINE
                     }
-                } else {
-                    qrDisplay.classList.remove('visible');
                 }
-            
 
 
 
