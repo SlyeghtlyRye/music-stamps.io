@@ -2318,8 +2318,37 @@
                     const geometry = parseSTL(buffer);
                     console.log('Geometry parsed, vertices:', geometry.attributes.position.count);
                     
+                    // Calculate colors based on Z-height (top layer gets different color)
+                    const positions = geometry.attributes.position;
+                    const colors = [];
+                    let maxZ = -Infinity;
+                    let minZ = Infinity;
+
+                    // Find min/max Z values
+                    for (let i = 0; i < positions.count; i++) {
+                        const z = positions.getZ(i);
+                        maxZ = Math.max(maxZ, z);
+                        minZ = Math.min(minZ, z);
+                    }
+
+                    // Define the threshold for "top layer" (adjust this value)
+                    const topLayerThreshold = maxZ - (maxZ - minZ) * 0.2; // Top 20% of height
+
+                    // Assign colors: top layer = red, rest = gray
+                    for (let i = 0; i < positions.count; i++) {
+                        const z = positions.getZ(i);
+                        if (z >= topLayerThreshold) {
+                            colors.push(1.0, 0.0, 0.0); // Red for top layer
+                        } else {
+                            colors.push(0.5, 0.5, 0.5); // Gray for base
+                        }
+                    }
+
+                    // Add color attribute to geometry
+                    geometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
+
                     const material = new THREE.MeshPhongMaterial({
-                        color: 0x323232,
+                        vertexColors: true, // Enable vertex colors
                         specular: 0x111111,
                         shininess: 200
                     });
@@ -2342,9 +2371,10 @@
                     mesh.scale.setScalar(scale);
 
                     // Now adjust visual position AFTER geometry is centered
-                    mesh.position.set(0, 0, 0);  // Your right/up adjustments
+                    mesh.position.set(0, 0, 0);
 
                     scene.add(mesh);
+                    
                     // Animation loop with rotation control
                     let animationId;
                     function animate() {
