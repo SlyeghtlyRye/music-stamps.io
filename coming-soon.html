@@ -2461,6 +2461,26 @@
             return `${mins}:${secs.toString().padStart(2, '0')}`;
         }
 
+        // ADD THESE TWO FUNCTIONS HERE:
+        function getWeatherEmoji(code) {
+            const weatherEmojis = {
+                0: '☀️', 1: '🌤️', 2: '⛅', 3: '☁️',
+                45: '🌫️', 48: '🌫️',
+                51: '🌦️', 53: '🌦️', 55: '🌧️',
+                61: '🌧️', 63: '🌧️', 65: '⛈️',
+                71: '🌨️', 73: '❄️', 75: '❄️', 77: '❄️',
+                80: '🌦️', 81: '🌧️', 82: '⛈️',
+                85: '🌨️', 86: '❄️',
+                95: '⛈️', 96: '⛈️', 99: '⛈️'
+            };
+            return weatherEmojis[code] || '🌡️';
+        }
+
+        function fetchHistoricalWeather(uploadDate) {
+            // Weather is already loaded from database, nothing to fetch
+            console.log('Weather data loaded from database for:', uploadDate);
+        }
+
         let currentCarouselIndex = 0;
 
         function nextCarouselItem() {
