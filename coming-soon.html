@@ -1771,19 +1771,16 @@
             const song = allSongs.find(s => s.id === songId);
             if (!song) return;
             
-            // Re-add required attributes when opening
-            const editInputs = editModal.querySelectorAll('input[name^="edit"]');
-            editInputs.forEach(input => {
-                if (input.type !== 'hidden') {
-                    input.setAttribute('required', 'required');
-                }
-            });
-            
             editingSongId = songId;
             document.getElementById('editSongId').value = songId;
             document.getElementById('editSongName').value = song.name;
             document.getElementById('editArtistName').value = song.artist;
             document.getElementById('editAlbumName').value = song.album;
+            
+            // Re-add required attributes when opening
+            document.getElementById('editSongName').setAttribute('required', 'required');
+            document.getElementById('editArtistName').setAttribute('required', 'required');
+            document.getElementById('editAlbumName').setAttribute('required', 'required');
             
             editModal.classList.add('active');
         }
@@ -1792,14 +1789,14 @@
             editModal.classList.remove('active');
             editingSongId = null;
             
-            // Clear the form
-            document.getElementById('editForm').reset();
-            
-            // Remove validation errors
+            // Remove required BEFORE resetting
             const editInputs = editModal.querySelectorAll('input[required]');
             editInputs.forEach(input => {
                 input.removeAttribute('required');
             });
+            
+            // Then reset the form
+            document.getElementById('editForm').reset();
             
             document.getElementById('editError').classList.remove('show');
             document.getElementById('editSuccess').classList.remove('show');
