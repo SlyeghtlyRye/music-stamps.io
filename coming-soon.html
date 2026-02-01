@@ -138,6 +138,22 @@
             border-color: #ff0000;
         }
 
+
+        .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #000;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            resize: vertical;
+        }
+
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #ff0000;
+        }
+
+
         .submit-btn {
             width: 100%;
             padding: 12px;
@@ -1340,6 +1356,10 @@
                     <input type="text" id="albumName" name="albumName" required>
                 </div>
                 <div class="form-group">
+                    <label for="songDescription">Description (for AI art)</label>
+                    <textarea id="songDescription" name="songDescription" rows="3" placeholder="Describe the mood, theme, or visuals for this song..." required></textarea>
+                </div>
+                <div class="form-group">
                     <label for="songFile">Audio File</label>
                     <input type="file" id="songFile" name="songFile" accept="audio/*" required>
                 </div>
@@ -1596,6 +1616,7 @@
             const songName = document.getElementById('songName').value;
             const artistName = document.getElementById('artistName').value;
             const albumName = document.getElementById('albumName').value;
+            const songDescription = document.getElementById('songDescription').value; // NEW
             
             if (!songFile) {
                 errorMsg.textContent = 'Please select an audio file';
@@ -1604,7 +1625,7 @@
             }
             
             uploadBtn.disabled = true;
-            uploadBtn.textContent = 'Uploading...';
+            uploadBtn.textContent = 'Uploading & Generating AI Art...'; // UPDATED
             errorMsg.classList.remove('show');
             successMsg.classList.remove('show');
             
@@ -1614,6 +1635,7 @@
                 formData.append('songName', songName);
                 formData.append('artistName', artistName);
                 formData.append('albumName', albumName);
+                formData.append('description', songDescription); // NEW
                 
                 const response = await fetch(`${AUTH_API_URL}/songs/upload`, {
                     method: 'POST',
@@ -1626,11 +1648,10 @@
                 const data = await response.json();
                 
                 if (data.success) {
-                    successMsg.textContent = 'Song uploaded successfully!';
+                    successMsg.textContent = 'Song uploaded & AI art generated successfully!';
                     successMsg.classList.add('show');
                     document.getElementById('uploadForm').reset();
                     
-                    // Reload songs
                     await loadSongs();
                     
                     setTimeout(() => {
@@ -1648,6 +1669,7 @@
                 uploadBtn.textContent = 'Upload Song';
             }
         }
+
 
         function closeModal() {
             loginModal.classList.remove('active');
@@ -2429,7 +2451,7 @@
 
                     for (let i = 0; i < positions.count; i++) {
                         const z = positions.getZ(i);
-                        if (z >= topLayerThreshold) {
+                        if (z >= topLayerThreshold) {   
                             colors.push(0.0, 0.0, 0.0); // Black top
                         } else {
                             colors.push(1.0, 1.0, 1.0); // White base
