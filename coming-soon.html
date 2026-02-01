@@ -1120,6 +1120,134 @@
             padding: 20px;
         }
 
+        .chip-slot-inner {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.6s;
+        }
+
+        .chip-slot.flipped .chip-slot-inner {
+            transform: rotateY(180deg);
+        }
+
+        .chip-front, .chip-back {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            backface-visibility: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .chip-front {
+            transform: rotateY(0deg);
+        }
+
+        .chip-back {
+            transform: rotateY(180deg);
+            background: #fff;
+        }
+
+        .info-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 24px;
+            height: 24px;
+            background: #000;
+            color: #fff;
+            border: 2px solid #000;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            z-index: 10;
+        }
+
+        .info-btn:hover {
+            background: #333;
+            transform: scale(1.1);
+        }
+
+        .back-btn {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            width: 24px;
+            height: 24px;
+            background: #ff0000;
+            color: #fff;
+            border: 2px solid #000;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            z-index: 10;
+        }
+
+        .back-btn:hover {
+            background: #cc0000;
+            transform: scale(1.1);
+        }
+
+        .song-details {
+            width: 100%;
+            text-align: left;
+            font-size: 12px;
+            line-height: 1.6;
+            color: #333;
+        }
+
+        .song-details h3 {
+            font-size: 16px;
+            margin-bottom: 15px;
+            text-align: center;
+            border-bottom: 2px solid #000;
+            padding-bottom: 10px;
+        }
+
+        .detail-row {
+            margin-bottom: 12px;
+            padding: 8px;
+            background: #f5f5f5;
+            border: 1px solid #ddd;
+        }
+
+        .detail-label {
+            font-weight: bold;
+            color: #000;
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .detail-value {
+            color: #666;
+        }
+
+        .weather-info {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .weather-icon {
+            font-size: 20px;
+        }
+
         .chip-icon {
             width: 60px;
             height: 60px;
@@ -1993,32 +2121,104 @@
                 
                 chipSlot.classList.add('has-chip');
                 chipSlot.innerHTML = `
-                    <div class="loaded-chip">
-                        <div class="chip-icon">♪</div>
-                        <div class="track-info">
-                            <div class="track-title">${song.name}</div>
-                            <div class="track-details">${song.artist} • ${song.album}</div>
-                        </div>
-                        <div class="player-controls">
-                            <div class="control-buttons">
-                                <button class="control-btn" onclick="playPause()">PLAY</button>
+                    <div class="chip-slot-inner">
+                        <div class="chip-front">
+                            <button class="info-btn" onclick="flipCard()">i</button>
+                            <div class="chip-icon">♪</div>
+                            <div class="track-info">
+                                <div class="track-title">${song.name}</div>
+                                <div class="track-details">${song.artist} • ${song.album}</div>
                             </div>
-                            <div class="scrubber-container">
-                                <span class="time-display" id="currentTime">0:00</span>
-                                <div class="scrubber" onclick="seek(event)">
-                                    <div class="scrubber-progress" id="progress"></div>
+                            <div class="player-controls">
+                                <div class="control-buttons">
+                                    <button class="control-btn" onclick="playPause()">PLAY</button>
                                 </div>
-                                <span class="time-display" id="totalTime">0:00</span>
+                                <div class="scrubber-container">
+                                    <span class="time-display" id="currentTime">0:00</span>
+                                    <div class="scrubber" onclick="seek(event)">
+                                        <div class="scrubber-progress" id="progress"></div>
+                                    </div>
+                                    <span class="time-display" id="totalTime">0:00</span>
+                                </div>
+                                <div class="volume-container">
+                                    <span class="volume-icon" id="volumeIcon" onclick="toggleMute()">🔊</span>
+                                    <div class="volume-slider" onclick="setVolume(event)">
+                                        <div class="volume-level" id="volumeLevel" style="width: 65%;"></div>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="volume-container">
-                                <span class="volume-icon" id="volumeIcon" onclick="toggleMute()">🔊</span>
-                                <div class="volume-slider" onclick="setVolume(event)">
-                                    <div class="volume-level" id="volumeLevel" style="width: 65%;"></div>
+                        </div>
+                        
+                        <div class="chip-back">
+                            <button class="back-btn" onclick="flipCard()">←</button>
+                            <div class="song-details">
+                                <h3>Song Details</h3>
+                                
+                                <div class="detail-row">
+                                    <span class="detail-label">Title</span>
+                                    <span class="detail-value">${song.name}</span>
+                                </div>
+                                
+                                <div class="detail-row">
+                                    <span class="detail-label">Artist</span>
+                                    <span class="detail-value">${song.artist}</span>
+                                </div>
+                                
+                                <div class="detail-row">
+                                    <span class="detail-label">Album</span>
+                                    <span class="detail-value">${song.album}</span>
+                                </div>
+                                
+                                ${song.description ? `
+                                <div class="detail-row">
+                                    <span class="detail-label">Description</span>
+                                    <span class="detail-value">${song.description}</span>
+                                </div>
+                                ` : ''}
+                                
+                                <div class="detail-row">
+                                    <span class="detail-label">Album Art</span>
+                                    <span class="detail-value">${song.album_art_url ? (song.ai_generated ? 'AI Generated' : 'Custom Upload') : 'None'}</span>
+                                </div>
+                                
+                                <div class="detail-row">
+                                    <span class="detail-label">Uploaded</span>
+                                    <span class="detail-value" id="uploadDate">Loading...</span>
+                                </div>
+                                
+                                <div class="detail-row">
+                                    <span class="detail-label">Weather on Upload</span>
+                                    <div class="detail-value weather-info">
+                                        ${song.weather_desc ? `
+                                            <span class="weather-icon">${getWeatherEmoji(song.weather_code)}</span>
+                                            <span>${song.weather_desc}, ${song.weather_temp_max}°C / ${song.weather_temp_min}°C</span>
+                                        ` : '<span>Weather data unavailable</span>'}
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 `;
+
+                // Format and display upload date
+                if (song.created_at || song.uploaded_at) {
+                    const uploadDate = new Date(song.created_at || song.uploaded_at);
+                    const dateStr = uploadDate.toLocaleDateString('en-US', { 
+                        weekday: 'long', 
+                        year: 'numeric', 
+                        month: 'long', 
+                        day: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    });
+                    setTimeout(() => {
+                        const dateEl = document.getElementById('uploadDate');
+                        if (dateEl) dateEl.textContent = dateStr;
+                    }, 100);
+                    
+                    // Fetch weather for upload date
+                    fetchHistoricalWeather(uploadDate);
+                }
 
 
                 // Show QR code if available (will be displayed since we're switching to PROJECTS)
@@ -2094,6 +2294,11 @@
                 }
             }, 1000);
         }
+
+        function flipCard() {
+            chipSlot.classList.toggle('flipped');
+        }
+
 
         function downloadQR() {
             if (!currentChip || !currentChip.qr_code_url) return;
