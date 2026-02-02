@@ -410,19 +410,13 @@
 
         /* Player Area */
         .player-area {
-            padding: 0px 40px;
             height: 100vh;
-            min-height: 100vh;
-            width: 100%;
             display: flex;
-            align-items: flex-start;  /* ← Keep this */
+            align-items: center;
             justify-content: center;
-            position: absolute;
-            top: 100vh;
-            left: 0;
-            right: 0;
-            overflow: visible;  /* ← Keep this */
-            transform: translateY(25px);
+            padding: 0px;
+            transform: translateY(70px);
+
         }
 
         .container {
@@ -461,19 +455,22 @@
         }
 
         .content-box {
-            padding: 20px;
+            padding: 5px;
             border: 3px solid #000;
-            border-right: 3px solid #000;;
+            border-right: 3px solid #000;
             background: #fff;
             position: relative;
             order: 1;
-            flex: 1;
+            flex: 0 1 auto;
             max-width: 100%;
             min-width: 280px;
-            height: 500px; /* Fixed height - matches container */
-            max-height: 500px; /* Prevent any stretching */
-            overflow-y: auto;
-            display: block;
+            overflow-y: auto;       /* ← Keep this */
+            overflow-x: hidden;     /* ← Add this */
+            display: flex;          /* ← CHANGE from block to flex */
+            flex-direction: column; /* ← ADD THIS */
+            height: auto;
+            min-height: 575px;
+            max-height: calc(100vh - 80px);  /* ← Adjust value */
             padding-bottom: 20px;
         }
 
@@ -498,6 +495,7 @@
             transform: translate(-50%, -50%);
             width: 300px;
             height: 280px;
+            overflow: visible !important;
             border: 3px dashed #ccc;
             display: flex;
             flex-direction: column;
@@ -921,21 +919,19 @@
             .content-box {
                 padding: 5px;
                 border: 3px solid #000;
-                border-right: 3px solid #000;
+                border-right: 3px solid #000;;
                 background: #fff;
                 position: relative;
                 order: 1;
                 flex: 0 1 auto;
                 max-width: 100%;
                 min-width: 280px;
-                overflow-y: auto;       /* ← Keep this */
-                overflow-x: hidden;     /* ← Add this */
-                display: flex;          /* ← CHANGE from block to flex */
-                flex-direction: column; /* ← ADD THIS */
-                height: auto;
+                overflow-y: auto;
+                display: block;
+                height: auto;           /* ← CHANGED */
                 min-height: 575px;
-                max-height: calc(100vh - 80px);  /* ← Adjust value */
-                padding-bottom: 20px;
+                max-height: none;       /* ← CHANGED */
+                padding-bottom: 20px;   /* ← CHANGED */
             }
 
             .chip-slot {
@@ -1151,7 +1147,7 @@
             align-items: center;
             justify-content: flex-start;
             padding: 20px;
-            overflow-y: auto;
+            overflow-y: visible;
         }
 
         .chip-front {
