@@ -2232,7 +2232,7 @@
                                         ${song.weather_desc ? `
                                             <span class="weather-icon">${getWeatherEmoji(song.weather_code)}</span>
                                             <span>${song.weather_desc}, ${song.weather_temp_max}°C / ${song.weather_temp_min}°C</span>
-                                            ${song.weather_location ? `<br><small style="color: #999;">📍 ${song.weather_location}</small>` : ''}
+                                            ${song.weather_location ? ` <span style="color: #999;">📍 ${song.weather_location}</span>` : ''}
                                         ` : '<span>Weather data unavailable</span>'}
                                     </div>
                                 </div>
