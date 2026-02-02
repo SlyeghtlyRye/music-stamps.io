@@ -1677,15 +1677,21 @@
                 
                 if (data.success) {
                     allSongs = data.songs;
+                    console.log('=== SONGS LOADED ===');
+                    console.log('Total songs:', allSongs.length);
+                    if (allSongs.length > 0) {
+                        console.log('First song data:', allSongs[0]);
+                        console.log('Description:', allSongs[0].description);
+                        console.log('Album Art:', allSongs[0].album_art_url);
+                        console.log('Weather Location:', allSongs[0].weather_location);
+                    }
                     renderSongs();
                 }
             } catch (error) {
                 console.error('Failed to load songs:', error);
-                // Render placeholders when API fails (localhost)
                 renderSongs();
             }
         }
-
 
         function renderSongs() {
             const addBtn = chipShelf.querySelector('.add-song-btn');
