@@ -1804,17 +1804,31 @@
             // Get user's location for weather
             let userLocation = { latitude: null, longitude: null };
             try {
+                // More explicit permission request
                 const position = await new Promise((resolve, reject) => {
-                    navigator.geolocation.getCurrentPosition(resolve, reject, {
-                        timeout: 5000,
-                        maximumAge: 300000
-                    });
+                    if (!navigator.geolocation) {
+                        reject(new Error('Geolocation not supported'));
+                        return;
+                    }
+                    
+                    navigator.geolocation.getCurrentPosition(
+                        resolve, 
+                        reject, 
+                        {
+                            enableHighAccuracy: true,
+                            timeout: 10000,
+                            maximumAge: 0
+                        }
+                    );
                 });
+                
                 userLocation.latitude = position.coords.latitude;
                 userLocation.longitude = position.coords.longitude;
-                console.log('Using user location:', userLocation);
+                console.log('✓ Using GPS location:', userLocation);
+                
             } catch (error) {
-                console.log('Location permission denied or unavailable');
+                console.log('⚠ Location permission denied or unavailable:', error.message);
+                console.log('→ Will use IP-based fallback');
             }
 
 
