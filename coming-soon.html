@@ -2258,7 +2258,7 @@
                                         ${song.weather_desc ? `
                                             <span class="weather-icon">${getWeatherEmoji(song.weather_code)}</span>
                                             <span>${song.weather_desc}, ${song.weather_temp_max}°C / ${song.weather_temp_min}°C</span>
-                                            ${song.weather_location ? ` <span style="color: #999;">📍 ${song.weather_location}</span>` : ''}
+                                            ${song.weather_location ? `<br><span style="color: #999; display: flex; align-items: center; gap: 4px; margin-top: 4px;"><span>📍</span><span>${song.weather_location}</span></span>` : ''}
                                         ` : '<span>Weather data unavailable</span>'}
                                     </div>
                                 </div>
