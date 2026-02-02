@@ -1801,6 +1801,23 @@
             const albumName = document.getElementById('albumName').value;
             const songDescription = document.getElementById('songDescription').value;
             
+            // Get user's location for weather
+            let userLocation = { latitude: null, longitude: null };
+            try {
+                const position = await new Promise((resolve, reject) => {
+                    navigator.geolocation.getCurrentPosition(resolve, reject, {
+                        timeout: 5000,
+                        maximumAge: 300000
+                    });
+                });
+                userLocation.latitude = position.coords.latitude;
+                userLocation.longitude = position.coords.longitude;
+                console.log('Using user location:', userLocation);
+            } catch (error) {
+                console.log('Location permission denied or unavailable');
+            }
+
+
             if (!songFile) {
                 errorMsg.textContent = 'Please select an audio file';
                 errorMsg.classList.add('show');
@@ -1828,6 +1845,9 @@
                 formData.append('artistName', artistName);
                 formData.append('albumName', albumName);
                 formData.append('description', songDescription);
+
+                if (userLocation.latitude) formData.append('latitude', userLocation.latitude);
+                if (userLocation.longitude) formData.append('longitude', userLocation.longitude);
                 
                 // NEW: Add album art if uploaded
                 if (albumArt) {
@@ -2178,7 +2198,7 @@
                                 
                                 <div class="detail-row">
                                     <span class="detail-label">Album Art</span>
-                                    <span class="detail-value">${song.album_art_url ? (song.ai_generated ? 'AI Generated' : 'Custom Upload') : 'None'}</span>
+                                    <span class="detail-value">${song.album_art_url ? 'AI Generated' : 'None'}</span>
                                 </div>
 
                                 <div class="detail-row">
@@ -2210,7 +2230,8 @@
                         month: 'long', 
                         day: 'numeric',
                         hour: '2-digit',
-                        minute: '2-digit'
+                        minute: '2-digit',
+                        timeZoneName: 'short'
                     });
                     setTimeout(() => {
                         const dateEl = document.getElementById('uploadDate');
