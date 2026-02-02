@@ -1001,7 +1001,7 @@
             .nav-arrow.up {
                 top: 10px;
                 background: rgba(240, 240, 240, 0);
-                z-index: 150; /* CHANGE THIS - higher than container so it's clickable */
+                z-index: 50; /* CHANGE THIS - higher than container so it's clickable */
                 pointer-events: auto; /* ADD THIS to ensure it's clickable */
             }
 
@@ -1171,7 +1171,7 @@
             align-items: center;
             justify-content: center;
             transition: all 0.2s;
-            z-index: 10;
+            z-index: 200; /* CHANGED: Higher than the nav-arrow's 150 */
         }
 
         .info-btn:hover {
