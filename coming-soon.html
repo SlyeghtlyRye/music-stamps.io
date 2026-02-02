@@ -1845,7 +1845,8 @@
             }
             
             uploadBtn.disabled = true;
-            
+            const originalText = uploadBtn.textContent;
+            uploadBtn.textContent = 'Uploading...'; // Shows immediately
             // UPDATE BUTTON TEXT BASED ON WHAT'S BEING DONE
             if (albumArt) {
                 uploadBtn.textContent = 'Uploading with your album art...';
@@ -1854,7 +1855,15 @@
             } else {
                 uploadBtn.textContent = 'Uploading...';
             }
-            
+
+            const response = await fetch(`${AUTH_API_URL}/songs/upload`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${authToken}`
+                },
+                body: formData
+            });
+                    
             errorMsg.classList.remove('show');
             successMsg.classList.remove('show');
             
@@ -1963,13 +1972,19 @@
                 input.removeAttribute('required');
             });
             
-            // Then reset the form
+            // Reset the form
             document.getElementById('editForm').reset();
+            
+            // Reset delete button text in case it was changed
+            const deleteBtn = editModal.querySelector('.delete-btn');
+            if (deleteBtn) {
+                deleteBtn.disabled = false;
+                deleteBtn.textContent = 'Delete Song';
+            }
             
             document.getElementById('editError').classList.remove('show');
             document.getElementById('editSuccess').classList.remove('show');
         }
-
 
         async function handleEdit(event) {
             event.preventDefault();
@@ -2026,38 +2041,52 @@
             }
         }
 
-        async function confirmDelete() {
-            if (!confirm('Are you sure you want to delete this song? This cannot be undone.')) {
-                return;
-            }
-            
-            const songId = document.getElementById('editSongId').value;
-            const errorMsg = document.getElementById('editError');
-            
-            errorMsg.classList.remove('show');
-            
-            try {
-                const response = await fetch(`${AUTH_API_URL}/songs/${songId}`, {
-                    method: 'DELETE',
-                    headers: {
-                        'Authorization': `Bearer ${authToken}`
-                    }
-                });
-                
-                const data = await response.json();
-                
-                if (data.success) {
-                    await loadSongs();
-                    closeEditModal();
-                } else {
-                    errorMsg.textContent = data.error || 'Delete failed';
-                    errorMsg.classList.add('show');
+            async function confirmDelete() {
+                if (!confirm('Are you sure you want to delete this song? This cannot be undone.')) {
+                    return;
                 }
-            } catch (error) {
-                errorMsg.textContent = 'Delete error. Please try again.';
-                errorMsg.classList.add('show');
+                
+                const songId = document.getElementById('editSongId').value;
+                const errorMsg = document.getElementById('editError');
+                
+                // ADD: Disable delete button to prevent double-clicks
+                const deleteBtn = event.target;
+                deleteBtn.disabled = true;
+                deleteBtn.textContent = 'Deleting...';
+                
+                errorMsg.classList.remove('show');
+                
+                try {
+                    const response = await fetch(`${AUTH_API_URL}/songs/${songId}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Authorization': `Bearer ${authToken}`
+                        }
+                    });
+                    
+                    const data = await response.json();
+                    
+                    if (data.success) {
+                        // Close modal BEFORE reloading songs
+                        closeEditModal();
+                        
+                        // Reload songs
+                        await loadSongs();
+                    } else {
+                        errorMsg.textContent = data.error || 'Delete failed';
+                        errorMsg.classList.add('show');
+                        deleteBtn.disabled = false; // Re-enable on error
+                        deleteBtn.textContent = 'Delete Song';
+                    }
+                } catch (error) {
+                    console.error('Delete error:', error); // ADD THIS LOG
+                    errorMsg.textContent = 'Delete error. Please try again.';
+                    errorMsg.classList.add('show');
+                    deleteBtn.disabled = false; // Re-enable on error
+                    deleteBtn.textContent = 'Delete Song';
+                }
             }
-        }
+
 
         welcomeMessage.addEventListener('click', function(e) {
             e.stopPropagation();
