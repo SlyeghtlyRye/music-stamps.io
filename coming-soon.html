@@ -1139,7 +1139,7 @@
 
         .chip-front, .chip-back {
             width: 100%;
-            height: 100%;
+            height: 100%;              /* ← KEEP 100% for desktop */
             position: absolute;
             backface-visibility: hidden;
             display: flex;
@@ -1147,7 +1147,7 @@
             align-items: center;
             justify-content: flex-start;
             padding: 20px;
-            overflow-y: visible;
+            overflow-y: auto;          /* ← KEEP auto for desktop */
         }
 
         .chip-front {
