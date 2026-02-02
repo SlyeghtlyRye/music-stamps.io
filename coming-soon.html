@@ -919,15 +919,15 @@
                 background: #fff;
                 position: relative;
                 order: 1;
-                flex: 0 1 auto; /* CHANGED from flex: 1 to prevent stretching */
+                flex: 0 1 auto;
                 max-width: 100%;
                 min-width: 280px;
                 overflow-y: auto;
                 display: block;
-                height: min-content;
+                height: auto;           /* ← CHANGED */
                 min-height: 575px;
-                max-height: 575px;
-                padding-bottom: 0px;
+                max-height: none;       /* ← CHANGED */
+                padding-bottom: 20px;   /* ← CHANGED */
             }
 
             .chip-slot {
