@@ -927,11 +927,12 @@
                 max-width: 100%;
                 min-width: 280px;
                 overflow-y: auto;
+                overflow-x: hidden;
                 display: block;
-                height: auto;           /* ← CHANGED */
+                height: auto;           
                 min-height: 575px;
-                max-height: none;       /* ← CHANGED */
-                padding-bottom: 20px;   /* ← CHANGED */
+                max-height: calc(100vh - 80px);  /* ← ADD THIS - gives it room to scroll */
+                padding-bottom: 20px;   
             }
 
             .chip-slot {
