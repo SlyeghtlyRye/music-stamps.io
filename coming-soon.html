@@ -1402,6 +1402,82 @@
             margin-bottom: 10px;
         }
 
+
+
+        /* Image Fullscreen Modal */
+        .image-fullscreen-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 3000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .image-fullscreen-modal.active {
+            display: flex;
+        }
+
+        .image-fullscreen-container {
+            max-width: 90vw;
+            max-height: 90vh;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .image-fullscreen-container img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            border: 3px solid #000;
+        }
+
+        .image-fullscreen-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 36px;
+            color: #fff;
+            cursor: pointer;
+            z-index: 10;
+        }
+
+        .image-fullscreen-close:hover {
+            color: #ff0000;
+        }
+
+        /* Image Expand Button */
+        .image-expand-btn {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            width: 25px;
+            height: 25px;
+            background: #000;
+            color: #fff;
+            border: 1px solid #000;
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 20;
+            transition: background 0.2s;
+            pointer-events: auto;
+        }
+
+        .image-expand-btn:hover {
+            background: #333;
+        }
+
+
+
         .welcome-message {
             position: absolute;
             bottom: 20px;
@@ -1595,6 +1671,14 @@
             <div class="model-loading">Loading 3D Model...</div>
         </div>
     </div>
+
+    <div class="image-fullscreen-modal" id="imageFullscreenModal">
+        <span class="image-fullscreen-close" onclick="closeImageFullscreen()">&times;</span>
+        <div class="image-fullscreen-container" id="imageFullscreenContainer">
+            <img id="fullscreenImage" src="" alt="Fullscreen Image">
+        </div>
+    </div>
+    
 
     <script>
         const AUTH_API_URL = 'https://music-stamps-auth.rybutler1000.workers.dev';
@@ -3141,6 +3225,26 @@
             
             viewer3DFullscreen = { scene, camera, renderer, container };
         }
+
+
+
+        function expandImage(event, imageUrl, imageTitle) {
+            event.stopPropagation(); // Prevent carousel navigation
+            
+            const modal = document.getElementById('imageFullscreenModal');
+            const img = document.getElementById('fullscreenImage');
+            
+            img.src = imageUrl;
+            img.alt = imageTitle;
+            modal.classList.add('active');
+        }
+
+        function closeImageFullscreen() {
+            const modal = document.getElementById('imageFullscreenModal');
+            modal.classList.remove('active');
+        }
+
+
 
         function handleFileSelect(inputId) {
             const input = document.getElementById(inputId);
