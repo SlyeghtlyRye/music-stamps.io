@@ -928,12 +928,13 @@
                 flex: 0 1 auto;
                 max-width: 100%;
                 min-width: 280px;
-                overflow-y: auto;
-                overflow-x: hidden;  /* ← ADD THIS */
-                display: block;
+                overflow-y: auto;       /* ← Keep this */
+                overflow-x: hidden;     /* ← Add this */
+                display: flex;          /* ← CHANGE from block to flex */
+                flex-direction: column; /* ← ADD THIS */
                 height: auto;
                 min-height: 575px;
-                max-height: calc(100vh - 100px);  /* ← ADD THIS - gives room for arrow */
+                max-height: calc(100vh - 80px);  /* ← Adjust value */
                 padding-bottom: 20px;
             }
 
