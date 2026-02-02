@@ -1801,7 +1801,7 @@
             const errorMsg = document.getElementById('uploadError');
             const successMsg = document.getElementById('uploadSuccess');
             const songFile = document.getElementById('songFile').files[0];
-            const albumArt = document.getElementById('albumArt').files[0]; // NEW
+            const albumArt = document.getElementById('albumArt').files[0];
             const songName = document.getElementById('songName').value;
             const artistName = document.getElementById('artistName').value;
             const albumName = document.getElementById('albumName').value;
@@ -1810,7 +1810,6 @@
             // Get user's location for weather
             let userLocation = { latitude: null, longitude: null };
             try {
-                // More explicit permission request
                 const position = await new Promise((resolve, reject) => {
                     if (!navigator.geolocation) {
                         reject(new Error('Geolocation not supported'));
@@ -1837,7 +1836,6 @@
                 console.log('→ Will use IP-based fallback');
             }
 
-
             if (!songFile) {
                 errorMsg.textContent = 'Please select an audio file';
                 errorMsg.classList.add('show');
@@ -1845,25 +1843,7 @@
             }
             
             uploadBtn.disabled = true;
-            const originalText = uploadBtn.textContent;
-            uploadBtn.textContent = 'Uploading...'; // Shows immediately
-            // UPDATE BUTTON TEXT BASED ON WHAT'S BEING DONE
-            if (albumArt) {
-                uploadBtn.textContent = 'Uploading with your album art...';
-            } else if (songDescription) {
-                uploadBtn.textContent = 'Uploading & Generating AI Art...';
-            } else {
-                uploadBtn.textContent = 'Uploading...';
-            }
-
-            const response = await fetch(`${AUTH_API_URL}/songs/upload`, {
-                method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${authToken}`
-                },
-                body: formData
-            });
-                    
+            uploadBtn.textContent = 'Uploading...'; // Show immediately
             errorMsg.classList.remove('show');
             successMsg.classList.remove('show');
             
@@ -1881,6 +1861,13 @@
                 // NEW: Add album art if uploaded
                 if (albumArt) {
                     formData.append('albumArt', albumArt);
+                }
+                
+                // NOW update button text based on what we're doing
+                if (albumArt) {
+                    uploadBtn.textContent = 'Uploading with your album art...';
+                } else if (songDescription) {
+                    uploadBtn.textContent = 'Uploading & Generating AI Art...';
                 }
                 
                 const response = await fetch(`${AUTH_API_URL}/songs/upload`, {
@@ -1903,6 +1890,11 @@
                     }
                     successMsg.classList.add('show');
                     document.getElementById('uploadForm').reset();
+                    
+                    // Hide all clear buttons
+                    document.querySelectorAll('.file-clear-btn').forEach(btn => {
+                        btn.classList.remove('visible');
+                    });
                     
                     await loadSongs();
                     
