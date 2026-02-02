@@ -825,13 +825,13 @@
         @media (max-width: 768px){
             body {
                 overflow: hidden; /* CHANGE from overflow-y: auto */
-                height: 100vh;
+                z-index: 200 !important;
                 position: relative;
             }
         
             .viewport {
                 height: 100vh;
-                overflow: hidden;
+                overflow: visible !important;
             }
 
             .scene {
@@ -839,7 +839,8 @@
                 position: relative;
                 min-height: 200vh;
                 height: 200vh;
-                overflow: hidden;
+                overflow: visible;
+                transform-style: preserve-3d; /* Ensures the flip doesn't flatten */
             }
 
             .scene.projects-view {
