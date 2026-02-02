@@ -2242,11 +2242,12 @@
                 `;
 
                 // Format and display upload date
-                if (song.created_at || song.uploaded_at) {
+                if (song.uploaded_at) {
                     // D1 returns timestamps like "2026-02-02 08:19:19" (UTC)
                     // We need to explicitly parse as UTC then convert to local
                     let uploadDate;
-                    const timestamp = song.created_at || song.uploaded_at;
+                    const timestamp = song.uploaded_at;
+
                     
                     // If timestamp doesn't end with 'Z', it's stored as UTC but not marked
                     if (timestamp && !timestamp.endsWith('Z')) {
