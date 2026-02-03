@@ -1078,6 +1078,9 @@
                 z-index: 1000;
             }
 
+
+
+
             .welcome-message.lightbulb {
                 font-size: 18px;
             }
@@ -1085,6 +1088,27 @@
             .scene.projects-view .welcome-message {
                 opacity: 1;
             }
+
+            @keyframes fadeInOut {
+                0% {
+                    opacity: 0;
+                    transform: translateX(-50%) translateY(20px);
+                }
+                15% {
+                    opacity: 1;
+                    transform: translateX(-50%) translateY(0);
+                }
+                85% {
+                    opacity: 1;
+                    transform: translateX(-50%) translateY(0);
+                }
+                100% {
+                    opacity: 0;
+                    transform: translateX(-50%) translateY(-20px);
+                }
+            }
+
+
         }
         
 
@@ -2393,7 +2417,7 @@
                 // Show QR code if available (will be displayed since we're switching to PROJECTS)
                 if (song.qr_code_url) {
                     console.log('Song STL URL:', song.stl_url); // DEBUG LINE
-                    
+                                        
                     qrDisplay.innerHTML = `
                         <div class="carousel-container" style="position: relative;">
                             <button class="carousel-nav prev" onclick="prevCarouselItem()">‹</button>
@@ -2421,9 +2445,13 @@
                                 </div>
                             </div>
                             <button class="carousel-nav next" onclick="nextCarouselItem()">›</button>
-                            <button class="image-expand-btn" id="carouselExpandBtn" onclick="expandCurrentItem(event)" title="Expand" style="position: absolute; top: 0px; right: 2px;">⛶</button>
+                            <button class="image-expand-btn" id="carouselExpandBtn" onclick="expandCurrentItem(event)" title="Expand" style="position: absolute; top: 3px; right: 8px;">⛶</button>
                         </div>
                         <div class="download-buttons">
+                            <button class="download-icon-btn" onclick="shareTrack()" title="Share Link">
+                                <span class="icon">🔗</span>
+                                <span>Share</span>
+                            </button>
                             <button class="download-icon-btn" onclick="downloadQR()" title="Download QR SVG">
                                 <span class="icon">↓</span>
                                 <span>SVG</span>
@@ -3294,6 +3322,95 @@
             // Trigger change event to update UI
             input.dispatchEvent(new Event('change'));
         }
+
+
+        function shareTrack() {
+            if (!currentChip) return;
+            
+            const trackUrl = `https://slyeghtlyrye.github.io/music-stamps.io/coming-soon.html?track=${currentChip.id}`;
+            const shareText = `Check out "${currentChip.name}" by ${currentChip.artist}`;
+            
+            // Check if Web Share API is available (mobile devices)
+            if (navigator.share) {
+                navigator.share({
+                    title: currentChip.name,
+                    text: shareText,
+                    url: trackUrl
+                }).then(() => {
+                    console.log('Shared successfully');
+                }).catch((error) => {
+                    console.log('Share cancelled or failed:', error);
+                    // Fallback to copy
+                    copyToClipboard(trackUrl);
+                });
+            } else {
+                // Fallback: Copy to clipboard
+                copyToClipboard(trackUrl);
+            }
+        }
+
+        function copyToClipboard(text) {
+            // Modern clipboard API
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(text).then(() => {
+                    showCopyNotification();
+                }).catch((err) => {
+                    console.error('Failed to copy:', err);
+                    // Fallback to older method
+                    fallbackCopyToClipboard(text);
+                });
+            } else {
+                fallbackCopyToClipboard(text);
+            }
+        }
+
+        function fallbackCopyToClipboard(text) {
+            const textArea = document.createElement('textarea');
+            textArea.value = text;
+            textArea.style.position = 'fixed';
+            textArea.style.top = '0';
+            textArea.style.left = '0';
+            textArea.style.opacity = '0';
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+            
+            try {
+                document.execCommand('copy');
+                showCopyNotification();
+            } catch (err) {
+                console.error('Fallback copy failed:', err);
+                alert('Failed to copy link. Please copy manually: ' + text);
+            }
+            
+            document.body.removeChild(textArea);
+        }
+
+        function showCopyNotification() {
+            // Create a temporary notification
+            const notification = document.createElement('div');
+            notification.textContent = 'Link copied to clipboard!';
+            notification.style.cssText = `
+                position: fixed;
+                bottom: 20px;
+                left: 50%;
+                transform: translateX(-50%);
+                background: #000;
+                color: #fff;
+                padding: 12px 24px;
+                border-radius: 4px;
+                font-size: 14px;
+                z-index: 10000;
+                animation: fadeInOut 2s ease;
+            `;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                document.body.removeChild(notification);
+            }, 2000);
+        }
+
 
 
     </script>
