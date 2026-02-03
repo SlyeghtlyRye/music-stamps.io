@@ -2399,12 +2399,18 @@
                             <button class="carousel-nav prev" onclick="prevCarouselItem()">‹</button>
                             <div class="carousel-content">
                                 <div class="carousel-item active" data-index="0">
-                                    <img src="${song.qr_code_url}" alt="QR Code">
+                                    <div style="position: relative; display: inline-block;">
+                                        <img src="${song.qr_code_url}" alt="QR Code">
+                                        <button class="image-expand-btn" onclick="expandImage(event, '${song.qr_code_url}', 'QR Code')" title="Expand">⛶</button>
+                                    </div>
                                     <h3>QR Code</h3>
                                 </div>
                                 <div class="carousel-item" data-index="1">
                                     ${song.album_art_url 
-                                        ? `<img src="${song.album_art_url}" alt="Album Art" style="width: 160px; height: 160px; object-fit: cover;">`
+                                        ? `<div style="position: relative; display: inline-block;">
+                                            <img src="${song.album_art_url}" alt="Album Art" style="width: 160px; height: 160px; object-fit: cover;">
+                                            <button class="image-expand-btn" onclick="expandImage(event, '${song.album_art_url}', 'Album Art')" title="Expand">⛶</button>
+                                        </div>`
                                         : `<div class="placeholder">Album Art<br>(Coming Soon)</div>`
                                     }
                                     <h3>Album Art</h3>
