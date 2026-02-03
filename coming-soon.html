@@ -2460,6 +2460,10 @@
                                 <span class="icon">↓</span>
                                 <span>STL</span>
                             </button>
+                            <button class="download-icon-btn" onclick="downloadTripleSTL()" title="Download Triple Platform STL">
+                                <span class="icon">↓</span>
+                                <span>3STL</span>
+                            </button>
                             <button class="download-icon-btn" onclick="download3MF()" title="Download 3MF">
                                 <span class="icon">↓</span>
                                 <span>3MF</span>
@@ -2532,6 +2536,18 @@
             const link = document.createElement('a');
             link.href = currentChip.threemf_url;
             link.download = `${currentChip.name}-qr-3d.3mf`;
+            link.target = '_blank';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        async function downloadTripleSTL() {
+            if (!currentChip || !currentChip.stl_triple_url) return;
+            
+            const link = document.createElement('a');
+            link.href = currentChip.stl_triple_url;
+            link.download = `${currentChip.name}-triple-platform.stl`;
             link.target = '_blank';
             document.body.appendChild(link);
             link.click();
