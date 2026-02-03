@@ -2174,11 +2174,8 @@
                     const data = await response.json();
                     
                     if (data.success) {
-                        // Close modal BEFORE reloading songs
-                        closeEditModal();
-                        
-                        // Reload songs
-                        await loadSongs();
+                        await loadSongs(); // ← MOVED UP
+                        closeEditModal();  // ← MOVED DOWN
                     } else {
                         errorMsg.textContent = data.error || 'Delete failed';
                         errorMsg.classList.add('show');
