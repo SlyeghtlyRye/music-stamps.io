@@ -2395,21 +2395,19 @@
                     console.log('Song STL URL:', song.stl_url); // DEBUG LINE
                     
                     qrDisplay.innerHTML = `
-                        <div class="carousel-container">
+                        <div class="carousel-container" style="position: relative;">
                             <button class="carousel-nav prev" onclick="prevCarouselItem()">‹</button>
                             <div class="carousel-content">
                                 <div class="carousel-item active" data-index="0">
-                                    <div style="position: relative; display: inline-block;">
-                                        <img src="${song.qr_code_url}" alt="QR Code">
-                                        <button class="image-expand-btn" onclick="expandImage(event, '${song.qr_code_url}', 'QR Code')" title="Expand">⛶</button>
+                                    <div style="width: 160px; height: 160px; border: 2px solid #000; background: #fff;">
+                                        <img src="${song.qr_code_url}" alt="QR Code" style="width: 100%; height: 100%; object-fit: contain;">
                                     </div>
                                     <h3>QR Code</h3>
                                 </div>
                                 <div class="carousel-item" data-index="1">
                                     ${song.album_art_url 
-                                        ? `<div style="position: relative; display: inline-block;">
-                                            <img src="${song.album_art_url}" alt="Album Art" style="width: 160px; height: 160px; object-fit: cover;">
-                                            <button class="image-expand-btn" onclick="expandImage(event, '${song.album_art_url}', 'Album Art')" title="Expand">⛶</button>
+                                        ? `<div style="width: 160px; height: 160px; border: 2px solid #000; background: #fff;">
+                                            <img src="${song.album_art_url}" alt="Album Art" style="width: 100%; height: 100%; object-fit: cover;">
                                         </div>`
                                         : `<div class="placeholder">Album Art<br>(Coming Soon)</div>`
                                     }
@@ -2419,11 +2417,11 @@
                                     <div class="model-viewer-container" id="modelViewer">
                                         <div class="model-loading">Loading 3D Model...</div>
                                     </div>
-                                    <button class="model-expand-btn" onclick="expandModelViewer(event)" title="Expand">⛶</button>
                                     <h3>3D Preview</h3>
                                 </div>
                             </div>
                             <button class="carousel-nav next" onclick="nextCarouselItem()">›</button>
+                            <button class="image-expand-btn" id="carouselExpandBtn" onclick="expandCurrentItem(event)" title="Expand" style="position: absolute; top: 8px; right: 8px;">⛶</button>
                         </div>
                         <div class="download-buttons">
                             <button class="download-icon-btn" onclick="downloadQR()" title="Download QR SVG">
@@ -3244,6 +3242,29 @@
             img.alt = imageTitle;
             modal.classList.add('active');
         }
+
+
+        function expandCurrentItem(event) {
+            event.stopPropagation();
+            
+            if (!currentChip) return;
+            
+            // Determine which carousel item is active
+            if (currentCarouselIndex === 0) {
+                // QR Code
+                expandImage(event, currentChip.qr_code_url, 'QR Code');
+            } else if (currentCarouselIndex === 1) {
+                // Album Art
+                if (currentChip.album_art_url) {
+                    expandImage(event, currentChip.album_art_url, 'Album Art');
+                }
+            } else if (currentCarouselIndex === 2) {
+                // 3D Model
+                expandModelViewer(event);
+            }
+        }
+
+
 
         function closeImageFullscreen() {
             const modal = document.getElementById('imageFullscreenModal');
