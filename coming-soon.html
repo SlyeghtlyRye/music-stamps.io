@@ -1921,6 +1921,19 @@
             const albumName = document.getElementById('albumName').value;
             const songDescription = document.getElementById('songDescription').value;
             
+            // VALIDATE BEFORE DISABLING BUTTON
+            if (!songFile) {
+                errorMsg.textContent = 'Please select an audio file';
+                errorMsg.classList.add('show');
+                return;
+            }
+            
+            // DISABLE BUTTON IMMEDIATELY AFTER VALIDATION
+            uploadBtn.disabled = true;
+            uploadBtn.textContent = 'Uploading...';
+            errorMsg.classList.remove('show');
+            successMsg.classList.remove('show');
+            
             // Get user's location for weather
             let userLocation = { latitude: null, longitude: null };
             try {
@@ -1949,17 +1962,6 @@
                 console.log('⚠ Location permission denied or unavailable:', error.message);
                 console.log('→ Will use IP-based fallback');
             }
-
-            if (!songFile) {
-                errorMsg.textContent = 'Please select an audio file';
-                errorMsg.classList.add('show');
-                return;
-            }
-            
-            uploadBtn.disabled = true;
-            uploadBtn.textContent = 'Uploading...'; // Show immediately
-            errorMsg.classList.remove('show');
-            successMsg.classList.remove('show');
             
             try {
                 const formData = new FormData();
@@ -1972,12 +1974,12 @@
                 if (userLocation.latitude) formData.append('latitude', userLocation.latitude);
                 if (userLocation.longitude) formData.append('longitude', userLocation.longitude);
                 
-                // NEW: Add album art if uploaded
+                // Add album art if uploaded
                 if (albumArt) {
                     formData.append('albumArt', albumArt);
                 }
                 
-                // NOW update button text based on what we're doing
+                // Update button text based on what we're doing
                 if (albumArt) {
                     uploadBtn.textContent = 'Uploading with your album art...';
                 } else if (songDescription) {
@@ -2027,7 +2029,6 @@
                 uploadBtn.textContent = 'Upload Song';
             }
         }
-
 
         function closeModal() {
             loginModal.classList.remove('active');
