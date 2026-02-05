@@ -2506,13 +2506,11 @@
                     // Initialize 3D viewer after carousel is added to DOM
                     if (song.stl_url) {
                         console.log('Initializing 3D viewer...'); // DEBUG LINE
-                        setTimeout(() => {
-                            init3DViewer(song.stl_url);
-                            document.getElementById('modelResetBtn').classList.add('visible');
-                        }, 100);
+                        setTimeout(() => init3DViewer(song.stl_url), 100);
                     } else {
                         console.log('No STL URL found!'); // DEBUG LINE
                     }
+                }
 
 
 
