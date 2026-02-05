@@ -2445,27 +2445,25 @@
                             <button class="carousel-nav next" onclick="nextCarouselItem()">›</button>
                             <button class="image-expand-btn" id="carouselExpandBtn" onclick="expandCurrentItem(event)" title="Expand" style="position: absolute; top: 0px; right: 0px;">⛶</button>
                         </div>
-                        <div class="download-buttons">
-                            <button class="download-icon-btn" onclick="shareTrack()" title="Share Link">
-                                <span class="icon">ᯓ⌲</span>
-                                <span>Share</span>
-                            </button>
-                            <button class="download-icon-btn" onclick="downloadQR()" title="Download QR SVG">
-                                <span class="icon">↓</span>
-                                <span>SVG</span>
-                            </button>
-                            <button class="download-icon-btn" onclick="downloadSTL()" title="Download STL">
-                                <span class="icon">↓</span>
-                                <span>STL</span>
-                            </button>
-                            <button class="download-icon-btn" onclick="downloadTripleSTL()" title="Download Triple Platform STL">
-                                <span class="icon">↓</span>
-                                <span>3STL</span>
-                            </button>
-                            <button class="download-icon-btn" onclick="download3MF()" title="Download 3MF">
-                                <span class="icon">↓</span>
-                                <span>3MF</span>
-                            </button>
+                        <div style="display: flex; flex-direction: column; gap: 8px; width: 100%; margin-top: 10px;">
+                            <select id="downloadSelect" style="width: 100%; padding: 8px; border: 2px solid #000; font-family: 'Courier New', monospace; font-size: 12px; background: #fff;">
+                                <option value="">Select download format...</option>
+                                <option value="svg">SVG Image</option>
+                                <option value="stl">QR Code STL</option>
+                                <option value="3mf">QR Code 3MF</option>
+                                <option value="stl-triple">Tagged QR Code STL</option>
+                                <option value="3mf-triple">Tagged QR Code 3MF</option>
+                            </select>
+                            <div style="display: flex; gap: 8px;">
+                                <button class="download-icon-btn" onclick="shareTrack()" title="Share Link" style="flex: 1;">
+                                    <span class="icon">ᯓ⌲</span>
+                                    <span>Share</span>
+                                </button>
+                                <button class="download-icon-btn" onclick="downloadSelected()" title="Download" style="flex: 2;">
+                                    <span class="icon">↓</span>
+                                    <span>Download</span>
+                                </button>
+                            </div>
                         </div>
                     `;
                     qrDisplay.classList.add('visible');
@@ -3425,7 +3423,53 @@
             }, 2000);
         }
 
+        function downloadSelected() {
+            const select = document.getElementById('downloadSelect');
+            const value = select.value;
+            
+            if (!value) {
+                alert('Please select a download format');
+                return;
+            }
+            
+            if (!currentChip) return;
+            
+            switch(value) {
+                case 'svg':
+                    downloadQR();
+                    break;
+                case 'stl':
+                    downloadSTL();
+                    break;
+                case '3mf':
+                    download3MF();
+                    break;
+                case 'stl-triple':
+                    downloadTripleSTL();
+                    break;
+                case '3mf-triple':
+                    downloadTriple3MF();
+                    break;
+            }
+            
+            // Reset dropdown after download
+            select.value = '';
+        }
 
+        function downloadTriple3MF() {
+            if (!currentChip || !currentChip.threemf_triple_url) {
+                alert('Tagged 3MF file not available');
+                return;
+            }
+            
+            const link = document.createElement('a');
+            link.href = currentChip.threemf_triple_url;
+            link.download = `${currentChip.name}-tagged-3d.3mf`;
+            link.target = '_blank';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
 
     </script>
 </body>
