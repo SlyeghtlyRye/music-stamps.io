@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <title>Music Stamps</title>
     <style>
         * {
@@ -2453,6 +2454,7 @@
                                 <option value="3mf">QR Code 3MF</option>
                                 <option value="stl-triple">Tagged QR Code STL</option>
                                 <option value="3mf-triple">Tagged QR Code 3MF</option>
+                                <option value="all">📦 Download All (ZIP)</option>
                             </select>
                             <div style="display: flex; gap: 8px;">
                                 <button class="download-icon-btn" onclick="shareTrack()" title="Share Link" style="flex: 1; height: 32px;">
@@ -2549,6 +2551,111 @@
             link.click();
             document.body.removeChild(link);
         }
+
+
+        async function downloadAll() {
+            if (!currentChip) return;
+            
+            // Check if JSZip is loaded
+            if (typeof JSZip === 'undefined') {
+                alert('ZIP library not loaded. Please refresh the page and try again.');
+                return;
+            }
+            
+            const zip = new JSZip();
+            const songName = currentChip.name.replace(/[^a-z0-9]/gi, '_').toLowerCase();
+            
+            // Show loading indicator
+            const select = document.getElementById('downloadSelect');
+            const originalText = select.options[select.selectedIndex].text;
+            select.options[select.selectedIndex].text = 'Creating ZIP...';
+            select.disabled = true;
+            
+            try {
+                // Helper function to fetch and add file to zip
+                async function addFileToZip(url, filename) {
+                    if (!url) return false;
+                    
+                    try {
+                        const response = await fetch(url);
+                        if (!response.ok) throw new Error(`Failed to fetch ${filename}`);
+                        
+                        const blob = await response.blob();
+                        zip.file(filename, blob);
+                        return true;
+                    } catch (error) {
+                        console.error(`Error adding ${filename}:`, error);
+                        return false;
+                    }
+                }
+                
+                // Add all available files
+                const files = [
+                    { url: currentChip.qr_code_url, name: `${songName}_qr.svg` },
+                    { url: currentChip.album_art_url, name: `${songName}_album_art.jpg` },
+                    { url: currentChip.stl_url, name: `${songName}_qr_3d.stl` },
+                    { url: currentChip.threemf_url, name: `${songName}_qr_3d.3mf` },
+                    { url: currentChip.stl_triple_url, name: `${songName}_tagged_3d.stl` },
+                    { url: currentChip.threemf_triple_url, name: `${songName}_tagged_3d.3mf` }
+                ];
+                
+                // Add files to ZIP
+                let addedCount = 0;
+                for (const file of files) {
+                    if (await addFileToZip(file.url, file.name)) {
+                        addedCount++;
+                    }
+                }
+                
+                if (addedCount === 0) {
+                    alert('No files available to download');
+                    return;
+                }
+                
+                // Create README file with song info
+                const readme = `Music Stamp: ${currentChip.name}
+                Artist: ${currentChip.artist}
+                Album: ${currentChip.album}
+                ${currentChip.description ? `\nDescription: ${currentChip.description}` : ''}
+
+                Files included:
+                ${files.map(f => f.url ? `- ${f.name}` : '').filter(Boolean).join('\n')}
+
+                Generated on: ${new Date().toLocaleString()}
+                `;
+                
+                zip.file('README.txt', readme);
+                
+                // Generate ZIP file
+                select.options[select.selectedIndex].text = 'Generating ZIP...';
+                const content = await zip.generateAsync({ 
+                    type: 'blob',
+                    compression: 'DEFLATE',
+                    compressionOptions: { level: 6 }
+                });
+                
+                // Download ZIP
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(content);
+                link.download = `${songName}_music_stamp.zip`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                
+                // Clean up
+                URL.revokeObjectURL(link.href);
+                
+            } catch (error) {
+                console.error('Error creating ZIP:', error);
+                alert('Failed to create ZIP file. Please try again.');
+            } finally {
+                // Reset dropdown
+                select.options[select.selectedIndex].text = originalText;
+                select.disabled = false;
+                select.value = '';
+            }
+        }
+
 
         function playPause() {
             if (!currentChip) return;
@@ -3450,11 +3557,16 @@
                 case '3mf-triple':
                     downloadTriple3MF();
                     break;
+                case 'all':
+                    downloadAll();
+                    return; // Don't reset dropdown yet, downloadAll() will handle it
             }
             
-            // Reset dropdown after download
+            // Reset dropdown after download (except for 'all' which handles it internally)
             select.value = '';
         }
+
+
 
         function downloadTriple3MF() {
             if (!currentChip || !currentChip.threemf_triple_url) {
