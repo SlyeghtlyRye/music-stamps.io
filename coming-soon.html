@@ -699,22 +699,22 @@
             position: absolute;
             bottom: 8px;
             right: 8px;
-            width: 60px;
+            width: 25px;    /* ← Match the expand button size */
             height: 25px;
             background: #ff0000;
             color: #fff;
-            border: 2px solid #000;
+            border: 1px solid #000;  /* ← Also match the border thickness */
             cursor: pointer;
-            font-size: 11px;
+            font-size: 14px;  /* ← Larger font for the icon */
             display: flex;
             align-items: center;
             justify-content: center;
             z-index: 20;
-            transition: all 0.2s;  /* Changed from just background */
+            transition: all 0.2s;
             pointer-events: auto;
             font-weight: bold;
             font-family: 'Courier New', monospace;
-            opacity: 0;  /* Hidden by default */
+            opacity: 0;
         }
 
         .model-viewer-container:hover .model-reset-btn {
