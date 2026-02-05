@@ -2453,10 +2453,10 @@
                             <button class="carousel-nav prev" onclick="prevCarouselItem()">‹</button>
                             <div class="carousel-content">
                                 <div class="carousel-item active" data-index="0">
-                                    <div style="width: 160px; height: 160px; border: 1px solid #000; background: #fff;">
-                                        <img src="${song.qr_code_url}" alt="QR Code" style="width: 100%; height: 100%; object-fit: contain;">
+                                    <div class="model-viewer-container" id="modelViewer">
+                                        <div class="model-loading">Loading 3D Model...</div>
                                     </div>
-                                    <h3>QR Code</h3>
+                                    <h3>3D Preview</h3>
                                 </div>
                                 <div class="carousel-item" data-index="1">
                                     ${song.album_art_url 
@@ -2466,12 +2466,6 @@
                                         : `<div class="placeholder">Album Art<br>(Coming Soon)</div>`
                                     }
                                     <h3>Album Art</h3>
-                                </div>
-                                <div class="carousel-item" data-index="2">
-                                    <div class="model-viewer-container" id="modelViewer">
-                                        <div class="model-loading">Loading 3D Model...</div>
-                                    </div>
-                                    <h3>3D Preview</h3>
                                 </div>
                             </div>
                             <button class="carousel-nav next" onclick="nextCarouselItem()">›</button>
@@ -2839,7 +2833,7 @@
             if (items.length === 0) return;
             
             // Clean up 3D viewer if leaving that slide
-            if (currentCarouselIndex === 2 && viewer3D) {
+            if (currentCarouselIndex === 0 && viewer3D) {
                 viewer3D.dispose();
                 viewer3D = null;
             }
@@ -2849,7 +2843,7 @@
             items[currentCarouselIndex].classList.add('active');
             
             // Reinitialize 3D viewer if entering that slide
-            if (currentCarouselIndex === 2 && currentChip && currentChip.stl_url) {
+            if (currentCarouselIndex === 0 && currentChip && currentChip.stl_url) {
                 setTimeout(() => init3DViewer(currentChip.stl_url), 100);
             }
         }
@@ -2859,7 +2853,7 @@
             if (items.length === 0) return;
             
             // Clean up 3D viewer if leaving that slide
-            if (currentCarouselIndex === 2 && viewer3D) {
+            if (currentCarouselIndex === 0 && viewer3D) {
                 viewer3D.dispose();
                 viewer3D = null;
             }
@@ -2869,7 +2863,7 @@
             items[currentCarouselIndex].classList.add('active');
             
             // Reinitialize 3D viewer if entering that slide
-            if (currentCarouselIndex === 2 && currentChip && currentChip.stl_url) {
+            if (currentCarouselIndex === 0 && currentChip && currentChip.stl_url) {
                 setTimeout(() => init3DViewer(currentChip.stl_url), 100);
             }
         }
@@ -3453,16 +3447,13 @@
             
             // Determine which carousel item is active
             if (currentCarouselIndex === 0) {
-                // QR Code
-                expandImage(event, currentChip.qr_code_url, 'QR Code');
+                // 3D Model (now first)
+                expandModelViewer(event);
             } else if (currentCarouselIndex === 1) {
                 // Album Art
                 if (currentChip.album_art_url) {
                     expandImage(event, currentChip.album_art_url, 'Album Art');
                 }
-            } else if (currentCarouselIndex === 2) {
-                // 3D Model
-                expandModelViewer(event);
             }
         }
 
