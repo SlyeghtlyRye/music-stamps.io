@@ -697,7 +697,7 @@
 
         .model-reset-btn {
             position: absolute;
-            bottom: 8px;    /* Inside the container */
+            bottom: 8px;
             right: 8px;
             width: 60px;
             height: 25px;
@@ -706,18 +706,19 @@
             border: 2px solid #000;
             cursor: pointer;
             font-size: 11px;
-            display: flex;  /* Always show when created */
+            display: flex;
             align-items: center;
             justify-content: center;
             z-index: 20;
-            transition: background 0.2s;
+            transition: all 0.2s;  /* Changed from just background */
             pointer-events: auto;
             font-weight: bold;
             font-family: 'Courier New', monospace;
+            opacity: 0;  /* Hidden by default */
         }
 
-        .model-reset-btn:hover {
-            background: #cc0000;
+        .model-viewer-container:hover .model-reset-btn {
+            opacity: 1;  /* Show on hover */
         }
 
         .model-reset-btn:hover {
@@ -2920,7 +2921,7 @@
             // Add reset button
             const resetBtn = document.createElement('button');
             resetBtn.className = 'model-reset-btn';
-            resetBtn.innerHTML = '↻ Reset';
+            resetBtn.innerHTML = '↻';
             resetBtn.title = 'Reset View';
             resetBtn.style.bottom = '20px';  // Different position for fullscreen
             resetBtn.style.right = '20px';
