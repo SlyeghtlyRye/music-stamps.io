@@ -695,6 +695,31 @@
             background: #333;
         }
 
+        .model-reset-btn {
+            position: absolute;
+            bottom: 8px;
+            right: 8px;
+            width: 25px;
+            height: 25px;
+            background: #ff0000;
+            color: #fff;
+            border: 1px solid #000;
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 20;
+            transition: background 0.2s;
+            pointer-events: auto;
+            font-weight: bold;
+        }
+
+        .model-reset-btn:hover {
+            background: #cc0000;
+        }
+
+
         .model-fullscreen-modal {
             display: none;
             position: fixed;
@@ -2887,6 +2912,20 @@
             container.appendChild(renderer.domElement);
             renderer.domElement.className = 'model-viewer-canvas';
             
+            // Add reset button
+            const resetBtn = document.createElement('button');
+            resetBtn.className = 'model-reset-btn';
+            resetBtn.innerHTML = '↻';
+            resetBtn.title = 'Reset View';
+            resetBtn.onclick = (e) => {
+                e.stopPropagation();
+                rotation.x = 0;
+                rotation.y = 0;
+                camera.position.set(0, 0, 50);
+                zoom = 50;
+            };
+            container.appendChild(resetBtn);
+            
             console.log('Scene created, loading STL...');
             
             // Lighting
@@ -2903,7 +2942,7 @@
             let previousMousePosition = { x: 0, y: 0 };
             let panStart = { x: 0, y: 0 };
             let rotation = { x: 0, y: 0 };
-            let zoom = 80;
+            let zoom = 50;
 
             renderer.domElement.addEventListener('mousedown', (e) => {
                 if (e.button === 0) { // Left mouse button - rotate
@@ -2966,7 +3005,6 @@
             // Store viewer for cleanup
             viewer3D = { scene, camera, renderer, container };
         }
-
 
         function loadSTLModel(url, scene, camera, renderer, container, rotation) {
             console.log('Fetching STL from:', url);
@@ -3303,6 +3341,20 @@
             container.innerHTML = '';
             container.appendChild(renderer.domElement);
             
+            // Add reset button
+            const resetBtn = document.createElement('button');
+            resetBtn.className = 'model-reset-btn';
+            resetBtn.innerHTML = '↻';
+            resetBtn.title = 'Reset View';
+            resetBtn.onclick = (e) => {
+                e.stopPropagation();
+                rotation.x = 0;
+                rotation.y = 0;
+                camera.position.set(0, 0, 80);
+                zoom = 80;
+            };
+            container.appendChild(resetBtn);
+            
             // Lighting
             const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
             scene.add(ambientLight);
@@ -3376,7 +3428,6 @@
             
             viewer3DFullscreen = { scene, camera, renderer, container };
         }
-
 
 
         function expandImage(event, imageUrl, imageTitle) {
