@@ -697,16 +697,16 @@
 
         .model-reset-btn {
             position: absolute;
-            bottom: -35px;  /* Move it below the container */
+            bottom: 8px;    /* Inside the container */
             right: 8px;
-            width: 60px;    /* Make it wider for text */
+            width: 60px;
             height: 25px;
             background: #ff0000;
             color: #fff;
             border: 2px solid #000;
             cursor: pointer;
             font-size: 11px;
-            display: none;  /* Hidden by default */
+            display: flex;  /* Always show when created */
             align-items: center;
             justify-content: center;
             z-index: 20;
@@ -716,8 +716,8 @@
             font-family: 'Courier New', monospace;
         }
 
-        .model-reset-btn.visible {
-            display: flex;  /* Show when visible class is added */
+        .model-reset-btn:hover {
+            background: #cc0000;
         }
 
         .model-reset-btn:hover {
@@ -2920,14 +2920,16 @@
             // Add reset button
             const resetBtn = document.createElement('button');
             resetBtn.className = 'model-reset-btn';
-            resetBtn.innerHTML = '↻';
+            resetBtn.innerHTML = '↻ Reset';
             resetBtn.title = 'Reset View';
+            resetBtn.style.bottom = '20px';  // Different position for fullscreen
+            resetBtn.style.right = '20px';
             resetBtn.onclick = (e) => {
                 e.stopPropagation();
                 rotation.x = 0;
                 rotation.y = 0;
-                camera.position.set(0, 0, 50);
-                zoom = 50;
+                camera.position.set(0, 0, 80);
+                zoom = 80;
             };
             container.appendChild(resetBtn);
             
