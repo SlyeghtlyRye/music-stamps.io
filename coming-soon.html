@@ -695,28 +695,30 @@
             position: absolute;
             bottom: 8px;
             right: 8px;
-            width: 25px;
+            width: 60px;
             height: 25px;
             background: #ff0000;
             color: #fff;
-            border: 1px solid #000;
+            border: 2px solid #000;
             cursor: pointer;
-            font-size: 14px;
+            font-size: 11px;
             display: flex;
             align-items: center;
             justify-content: center;
             z-index: 20;
-            transition: background 0.2s;
+            transition: all 0.2s;  /* Changed from just background */
             pointer-events: auto;
             font-weight: bold;
-        }
-
-        .model-reset-btn:hover {
-            background: #cc0000;
+            font-family: 'Courier New', monospace;
+            opacity: 0;  /* Hidden by default */
         }
 
         .model-viewer-container:hover .model-reset-btn {
             opacity: 1;  /* Show on hover */
+        }
+
+        .model-reset-btn:hover {
+            background: #cc0000;
         }
 
         .model-reset-btn:hover {
