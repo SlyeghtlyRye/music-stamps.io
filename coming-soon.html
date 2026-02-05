@@ -2448,56 +2448,53 @@
                     console.log('Song STL URL:', song.stl_url); // DEBUG LINE
                                         
                     qrDisplay.innerHTML = `
-                        <div style="position: relative;">
-                            <div class="carousel-container" style="position: relative;">
-                                <button class="carousel-nav prev" onclick="prevCarouselItem()">‹</button>
-                                <div class="carousel-content">
-                                    <div class="carousel-item active" data-index="0">
-                                        <div style="width: 160px; height: 160px; border: 1px solid #000; background: #fff;">
-                                            <img src="${song.qr_code_url}" alt="QR Code" style="width: 100%; height: 100%; object-fit: contain;">
-                                        </div>
-                                        <h3>QR Code</h3>
+                        <div class="carousel-container" style="position: relative;">
+                            <button class="carousel-nav prev" onclick="prevCarouselItem()">‹</button>
+                            <div class="carousel-content">
+                                <div class="carousel-item active" data-index="0">
+                                    <div style="width: 160px; height: 160px; border: 1px solid #000; background: #fff;">
+                                        <img src="${song.qr_code_url}" alt="QR Code" style="width: 100%; height: 100%; object-fit: contain;">
                                     </div>
-                                    <div class="carousel-item" data-index="1">
-                                        ${song.album_art_url 
-                                            ? `<div style="width: 160px; height: 160px; border: 1px solid #000; background: #fff;">
-                                                <img src="${song.album_art_url}" alt="Album Art" style="width: 100%; height: 100%; object-fit: cover;">
-                                            </div>`
-                                            : `<div class="placeholder">Album Art<br>(Coming Soon)</div>`
-                                        }
-                                        <h3>Album Art</h3>
-                                    </div>
-                                    <div class="carousel-item" data-index="2">
-                                        <div class="model-viewer-container" id="modelViewer">
-                                            <div class="model-loading">Loading 3D Model...</div>
-                                        </div>
-                                        <h3>3D Preview</h3>
-                                    </div>
+                                    <h3>QR Code</h3>
                                 </div>
-                                <button class="carousel-nav next" onclick="nextCarouselItem()">›</button>
-                                <button class="image-expand-btn" id="carouselExpandBtn" onclick="expandCurrentItem(event)" title="Expand" style="position: absolute; top: 0px; right: 0px;">⛶</button>
+                                <div class="carousel-item" data-index="1">
+                                    ${song.album_art_url 
+                                        ? `<div style="width: 160px; height: 160px; border: 1px solid #000; background: #fff;">
+                                            <img src="${song.album_art_url}" alt="Album Art" style="width: 100%; height: 100%; object-fit: cover;">
+                                        </div>`
+                                        : `<div class="placeholder">Album Art<br>(Coming Soon)</div>`
+                                    }
+                                    <h3>Album Art</h3>
+                                </div>
+                                <div class="carousel-item" data-index="2">
+                                    <div class="model-viewer-container" id="modelViewer">
+                                        <div class="model-loading">Loading 3D Model...</div>
+                                    </div>
+                                    <h3>3D Preview</h3>
+                                </div>
                             </div>
-                            <button class="model-reset-btn" id="modelResetBtn" onclick="reset3DView()" title="Reset View">↻ Reset</button>
-                            <div style="display: flex; flex-direction: column; gap: 8px; width: 100%; margin-top: 10px;">
-                                <select id="downloadSelect" style="width: 100%; padding: 4px; border: 2px solid #000; font-family: 'Courier New', monospace; font-size: 12px; background: #fff;">
-                                    <option value="">Select download option</option>
-                                    <option value="svg">SVG Image</option>
-                                    <option value="stl">QR Code STL</option>
-                                    <option value="3mf">QR Code 3MF</option>
-                                    <option value="stl-triple">Tagged QR Code STL</option>
-                                    <option value="3mf-triple">Tagged QR Code 3MF</option>
-                                    <option value="all">📦 Download All (ZIP)</option>
-                                </select>
-                                <div style="display: flex; gap: 8px;">
-                                    <button class="download-icon-btn" onclick="shareTrack()" title="Share Link" style="flex: 1; height: 32px;">
-                                        <span class="icon">ᯓ⌲</span>
-                                        <span>Share</span>
-                                    </button>
-                                    <button class="download-icon-btn" onclick="downloadSelected()" title="Download" style="flex: 2; height: 32px;">
-                                        <span class="icon">↓</span>
-                                        <span>Download</span>
-                                    </button>
-                                </div>
+                            <button class="carousel-nav next" onclick="nextCarouselItem()">›</button>
+                            <button class="image-expand-btn" id="carouselExpandBtn" onclick="expandCurrentItem(event)" title="Expand" style="position: absolute; top: 0px; right: 0px;">⛶</button>
+                        </div>
+                        <div style="display: flex; flex-direction: column; gap: 8px; width: 100%; margin-top: 10px;">
+                            <select id="downloadSelect" style="width: 100%; padding: 4px; border: 2px solid #000; font-family: 'Courier New', monospace; font-size: 12px; background: #fff;">
+                                <option value="">Select download option</option>
+                                <option value="svg">SVG Image</option>
+                                <option value="stl">QR Code STL</option>
+                                <option value="3mf">QR Code 3MF</option>
+                                <option value="stl-triple">Tagged QR Code STL</option>
+                                <option value="3mf-triple">Tagged QR Code 3MF</option>
+                                <option value="all">📦 Download All (ZIP)</option>
+                            </select>
+                            <div style="display: flex; gap: 8px;">
+                                <button class="download-icon-btn" onclick="shareTrack()" title="Share Link" style="flex: 1; height: 32px;">
+                                    <span class="icon">ᯓ⌲</span>
+                                    <span>Share</span>
+                                </button>
+                                <button class="download-icon-btn" onclick="downloadSelected()" title="Download" style="flex: 2; height: 32px;">
+                                    <span class="icon">↓</span>
+                                    <span>Download</span>
+                                </button>
                             </div>
                         </div>
                     `;
@@ -2835,6 +2832,7 @@
         }
 
         let currentCarouselIndex = 0;
+
         function nextCarouselItem() {
             const items = document.querySelectorAll('.carousel-item');
             if (items.length === 0) return;
@@ -2843,7 +2841,6 @@
             if (currentCarouselIndex === 2 && viewer3D) {
                 viewer3D.dispose();
                 viewer3D = null;
-                document.getElementById('modelResetBtn').classList.remove('visible');
             }
             
             items[currentCarouselIndex].classList.remove('active');
@@ -2852,10 +2849,7 @@
             
             // Reinitialize 3D viewer if entering that slide
             if (currentCarouselIndex === 2 && currentChip && currentChip.stl_url) {
-                setTimeout(() => {
-                    init3DViewer(currentChip.stl_url);
-                    document.getElementById('modelResetBtn').classList.add('visible');
-                }, 100);
+                setTimeout(() => init3DViewer(currentChip.stl_url), 100);
             }
         }
 
@@ -2867,7 +2861,6 @@
             if (currentCarouselIndex === 2 && viewer3D) {
                 viewer3D.dispose();
                 viewer3D = null;
-                document.getElementById('modelResetBtn').classList.remove('visible');
             }
             
             items[currentCarouselIndex].classList.remove('active');
@@ -2876,12 +2869,10 @@
             
             // Reinitialize 3D viewer if entering that slide
             if (currentCarouselIndex === 2 && currentChip && currentChip.stl_url) {
-                setTimeout(() => {
-                    init3DViewer(currentChip.stl_url);
-                    document.getElementById('modelResetBtn').classList.add('visible');
-                }, 100);
+                setTimeout(() => init3DViewer(currentChip.stl_url), 100);
             }
         }
+
         let viewer3D = null;
 
         function init3DViewer(stlUrl) {
@@ -3017,8 +3008,7 @@
             loadSTLModel(stlUrl, scene, camera, renderer, container, rotation);
             
             // Store viewer for cleanup
-            viewer3D = { scene, camera, renderer, container, rotation, zoom };
-
+            viewer3D = { scene, camera, renderer, container };
         }
 
         function loadSTLModel(url, scene, camera, renderer, container, rotation) {
@@ -3330,16 +3320,6 @@
             }
 
         let viewer3DFullscreen = null;
-
-        function reset3DView() {
-            if (viewer3D && viewer3D.rotation && viewer3D.camera) {
-                viewer3D.rotation.x = 0;
-                viewer3D.rotation.y = 0;
-                viewer3D.camera.position.set(0, 0, 50);
-                viewer3D.zoom = 50;
-            }
-}
-
 
         function init3DViewerFullscreen(stlUrl, container) {
             // Clean up any existing viewer
