@@ -2685,10 +2685,15 @@
                 }
                 
                 // Create README
+                const trackUrl = `https://slyeghtlyrye.github.io/music-stamps.io/coming-soon.html?track=${currentChip.id}`;
+
                 const readme = `Music Stamp: ${currentChip.name}
                 Artist: ${currentChip.artist}
                 Album: ${currentChip.album}
                 ${currentChip.description ? `\nDescription: ${currentChip.description}` : ''}
+
+                View Online: ${trackUrl}
+                Scan the QR code or visit the link above to play this track.
 
                 Files included:
                 ${files.map(f => f.url ? `- ${f.name}` : '').filter(Boolean).join('\n')}
