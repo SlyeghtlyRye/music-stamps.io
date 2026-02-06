@@ -2479,7 +2479,37 @@
                                         
                     qrDisplay.innerHTML = `
                         <div class="carousel-container" style="position: relative;">
-                            <!-- ... existing carousel code ... -->
+                            <button class="carousel-nav prev" onclick="prevCarouselItem()">‹</button>
+                            <div class="carousel-content">
+                                <!-- 3D Model Viewer (First Item) -->
+                                <div class="carousel-item active" data-index="0">
+                                    <div class="model-viewer-container" id="modelViewer">
+                                        <div class="model-loading">Loading 3D Model...</div>
+                                    </div>
+                                    <h3>3D Preview</h3>
+                                </div>
+                                
+                                <!-- QR Code (Second Item) -->
+                                <div class="carousel-item" data-index="1">
+                                    <div style="width: 160px; height: 160px; border: 2px solid #000; background: #fff;">
+                                        <img src="${song.qr_code_url}" alt="QR Code" style="width: 100%; height: 100%; object-fit: contain;">
+                                    </div>
+                                    <h3>QR Code</h3>
+                                </div>
+                                
+                                <!-- Album Art (Third Item) -->
+                                <div class="carousel-item" data-index="2">
+                                    ${song.album_art_url 
+                                        ? `<div style="width: 160px; height: 160px; border: 2px solid #000; background: #fff;">
+                                            <img src="${song.album_art_url}" alt="Album Art" style="width: 100%; height: 100%; object-fit: cover;">
+                                        </div>`
+                                        : `<div class="placeholder">Album Art<br>(Coming Soon)</div>`
+                                    }
+                                    <h3>Album Art</h3>
+                                </div>
+                            </div>
+                            <button class="carousel-nav next" onclick="nextCarouselItem()">›</button>
+                            <button class="image-expand-btn" id="carouselExpandBtn" onclick="expandCurrentItem(event)" title="Expand" style="position: absolute; top: 0px; right: 0px;">⛶</button>
                         </div>
                         <div style="display: flex; flex-direction: column; gap: 8px; width: 100%; margin-top: 10px;">
                             <select id="downloadSelect" style="width: 100%; padding: 4px; border: 2px solid #000; font-family: 'Courier New', monospace; font-size: 12px; background: #fff;">
