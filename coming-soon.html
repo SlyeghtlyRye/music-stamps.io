@@ -1684,6 +1684,21 @@
                         <button type="button" class="file-clear-btn" id="songFileClear" onclick="clearFile('songFile')" title="Clear">×</button>
                     </div>
                 </div>
+
+                <!-- Additional Files -->
+                <div class="form-group">
+                    <label for="additionalFiles">Additional Files (Optional)</label>
+                    <div class="file-input-wrapper">
+                        <input type="file" id="additionalFiles" name="additionalFiles" multiple onchange="handleAdditionalFilesSelect()">
+                        <button type="button" class="file-clear-btn" id="additionalFilesClear" onclick="clearAdditionalFiles()" title="Clear">×</button>
+                    </div>
+                    <small style="color: #666; font-size: 11px; display: block; margin-top: 5px;">
+                        Upload stems, source files, or other related content (multiple files allowed)
+                    </small>
+                    <div id="additionalFilesList" style="margin-top: 8px; font-size: 11px; color: #333;"></div>
+                </div>
+
+
                 <button type="submit" class="submit-btn" id="uploadBtn">Upload Song</button>
                 <div class="error-message" id="uploadError"></div>
                 <div class="success-message" id="uploadSuccess"></div>
@@ -1940,6 +1955,7 @@
             }
         }
 
+
         async function handleUpload(event) {
             event.preventDefault();
             
@@ -1948,19 +1964,18 @@
             const successMsg = document.getElementById('uploadSuccess');
             const songFile = document.getElementById('songFile').files[0];
             const albumArt = document.getElementById('albumArt').files[0];
+            const additionalFiles = document.getElementById('additionalFiles').files; 
             const songName = document.getElementById('songName').value;
             const artistName = document.getElementById('artistName').value;
             const albumName = document.getElementById('albumName').value;
             const songDescription = document.getElementById('songDescription').value;
             
-            // VALIDATE BEFORE DISABLING BUTTON
             if (!songFile) {
                 errorMsg.textContent = 'Please select an audio file';
                 errorMsg.classList.add('show');
                 return;
             }
             
-            // DISABLE BUTTON IMMEDIATELY AFTER VALIDATION
             uploadBtn.disabled = true;
             uploadBtn.textContent = 'Uploading...';
             errorMsg.classList.remove('show');
@@ -1992,7 +2007,6 @@
                 
             } catch (error) {
                 console.log('⚠ Location permission denied or unavailable:', error.message);
-                console.log('→ Will use IP-based fallback');
             }
             
             try {
@@ -2006,12 +2020,18 @@
                 if (userLocation.latitude) formData.append('latitude', userLocation.latitude);
                 if (userLocation.longitude) formData.append('longitude', userLocation.longitude);
                 
-                // Add album art if uploaded
                 if (albumArt) {
                     formData.append('albumArt', albumArt);
                 }
                 
-                // Update button text based on what we're doing
+                // NEW: Append additional files
+                if (additionalFiles && additionalFiles.length > 0) {
+                    for (let i = 0; i < additionalFiles.length; i++) {
+                        formData.append('additionalFiles', additionalFiles[i]);
+                    }
+                    uploadBtn.textContent = `Uploading song + ${additionalFiles.length} additional file(s)...`;
+                }
+                
                 if (albumArt) {
                     uploadBtn.textContent = 'Uploading with your album art...';
                 } else if (songDescription) {
@@ -2029,20 +2049,26 @@
                 const data = await response.json();
                 
                 if (data.success) {
+                    let message = 'Song uploaded';
                     if (albumArt) {
-                        successMsg.textContent = 'Song uploaded with your album art!';
+                        message += ' with your album art';
                     } else if (data.song.album_art_url) {
-                        successMsg.textContent = 'Song uploaded & AI art generated successfully!';
-                    } else {
-                        successMsg.textContent = 'Song uploaded successfully!';
+                        message += ' & AI art generated';
                     }
+                    if (additionalFiles && additionalFiles.length > 0) {
+                        message += ` + ${additionalFiles.length} additional file(s)`;
+                    }
+                    message += ' successfully!';
+                    
+                    successMsg.textContent = message;
                     successMsg.classList.add('show');
                     document.getElementById('uploadForm').reset();
                     
-                    // Hide all clear buttons
+                    // Clear all file inputs
                     document.querySelectorAll('.file-clear-btn').forEach(btn => {
                         btn.classList.remove('visible');
                     });
+                    clearAdditionalFiles();
                     
                     await loadSongs();
                     
@@ -2061,6 +2087,9 @@
                 uploadBtn.textContent = 'Upload Song';
             }
         }
+
+
+
 
         function closeModal() {
             loginModal.classList.remove('active');
@@ -2450,26 +2479,7 @@
                                         
                     qrDisplay.innerHTML = `
                         <div class="carousel-container" style="position: relative;">
-                            <button class="carousel-nav prev" onclick="prevCarouselItem()">‹</button>
-                            <div class="carousel-content">
-                                <div class="carousel-item active" data-index="0">
-                                    <div class="model-viewer-container" id="modelViewer">
-                                        <div class="model-loading">Loading 3D Model...</div>
-                                    </div>
-                                    <h3>3D Preview</h3>
-                                </div>
-                                <div class="carousel-item" data-index="1">
-                                    ${song.album_art_url 
-                                        ? `<div style="width: 160px; height: 160px; border: 1px solid #000; background: #fff;">
-                                            <img src="${song.album_art_url}" alt="Album Art" style="width: 100%; height: 100%; object-fit: cover;">
-                                        </div>`
-                                        : `<div class="placeholder">Album Art<br>(Coming Soon)</div>`
-                                    }
-                                    <h3>Album Art</h3>
-                                </div>
-                            </div>
-                            <button class="carousel-nav next" onclick="nextCarouselItem()">›</button>
-                            <button class="image-expand-btn" id="carouselExpandBtn" onclick="expandCurrentItem(event)" title="Expand" style="position: absolute; top: 0px; right: 0px;">⛶</button>
+                            <!-- ... existing carousel code ... -->
                         </div>
                         <div style="display: flex; flex-direction: column; gap: 8px; width: 100%; margin-top: 10px;">
                             <select id="downloadSelect" style="width: 100%; padding: 4px; border: 2px solid #000; font-family: 'Courier New', monospace; font-size: 12px; background: #fff;">
@@ -2479,6 +2489,8 @@
                                 <option value="3mf">QR Code 3MF</option>
                                 <option value="stl-triple">Tagged QR Code STL</option>
                                 <option value="3mf-triple">Tagged QR Code 3MF</option>
+                                ${song.additional_files && song.additional_files.length > 0 ? 
+                                    `<option value="additional">Additional Files (${song.additional_files.length})</option>` : ''}
                                 <option value="all">Download All (ZIP)</option>
                             </select>
                             <div style="display: flex; gap: 8px;">
@@ -2578,10 +2590,10 @@
         }
 
 
+
         async function downloadAll() {
             if (!currentChip) return;
             
-            // Check if JSZip is loaded
             if (typeof JSZip === 'undefined') {
                 alert('ZIP library not loaded. Please refresh the page and try again.');
                 return;
@@ -2590,14 +2602,12 @@
             const zip = new JSZip();
             const songName = currentChip.name.replace(/[^a-z0-9]/gi, '_').toLowerCase();
             
-            // Show loading indicator
             const select = document.getElementById('downloadSelect');
             const originalText = select.options[select.selectedIndex].text;
             select.options[select.selectedIndex].text = 'Creating ZIP...';
             select.disabled = true;
             
             try {
-                // Helper function to fetch and add file to zip
                 async function addFileToZip(url, filename) {
                     if (!url) return false;
                     
@@ -2614,7 +2624,6 @@
                     }
                 }
                 
-                // Add all available files
                 const files = [
                     { url: currentChip.qr_code_url, name: `${songName}_qr.svg` },
                     { url: currentChip.album_art_url, name: `${songName}_album_art.jpg` },
@@ -2624,11 +2633,19 @@
                     { url: currentChip.threemf_triple_url, name: `${songName}_tagged_3d.3mf` }
                 ];
                 
-                // Add files to ZIP
                 let addedCount = 0;
                 for (const file of files) {
                     if (await addFileToZip(file.url, file.name)) {
                         addedCount++;
+                    }
+                }
+                
+                // Add additional files to a subfolder
+                if (currentChip.additional_files && currentChip.additional_files.length > 0) {
+                    for (const file of currentChip.additional_files) {
+                        if (await addFileToZip(file.url, `additional/${file.original_name}`)) {
+                            addedCount++;
+                        }
                     }
                 }
                 
@@ -2637,7 +2654,7 @@
                     return;
                 }
                 
-                // Create README file with song info
+                // Create README
                 const readme = `Music Stamp: ${currentChip.name}
                 Artist: ${currentChip.artist}
                 Album: ${currentChip.album}
@@ -2645,13 +2662,14 @@
 
                 Files included:
                 ${files.map(f => f.url ? `- ${f.name}` : '').filter(Boolean).join('\n')}
+                ${currentChip.additional_files && currentChip.additional_files.length > 0 ? 
+                    `\nAdditional files:\n${currentChip.additional_files.map(f => `- additional/${f.original_name}`).join('\n')}` : ''}
 
                 Generated on: ${new Date().toLocaleString()}
                 `;
-                
+                        
                 zip.file('README.txt', readme);
                 
-                // Generate ZIP file
                 select.options[select.selectedIndex].text = 'Generating ZIP...';
                 const content = await zip.generateAsync({ 
                     type: 'blob',
@@ -2659,7 +2677,6 @@
                     compressionOptions: { level: 6 }
                 });
                 
-                // Download ZIP
                 const link = document.createElement('a');
                 link.href = URL.createObjectURL(content);
                 link.download = `${songName}_music_stamp.zip`;
@@ -2667,20 +2684,17 @@
                 link.click();
                 document.body.removeChild(link);
                 
-                // Clean up
                 URL.revokeObjectURL(link.href);
                 
             } catch (error) {
                 console.error('Error creating ZIP:', error);
                 alert('Failed to create ZIP file. Please try again.');
             } finally {
-                // Reset dropdown
                 select.options[select.selectedIndex].text = originalText;
                 select.disabled = false;
                 select.value = '';
             }
         }
-
 
         function playPause() {
             if (!currentChip) return;
@@ -3489,6 +3503,118 @@
             input.dispatchEvent(new Event('change'));
         }
 
+        
+        function handleAdditionalFilesSelect() {
+            const input = document.getElementById('additionalFiles');
+            const clearBtn = document.getElementById('additionalFilesClear');
+            const filesList = document.getElementById('additionalFilesList');
+            
+            if (input.files && input.files.length > 0) {
+                clearBtn.classList.add('visible');
+                
+                // Display file list
+                let html = '<strong>Selected files:</strong><br>';
+                for (let i = 0; i < input.files.length; i++) {
+                    const file = input.files[i];
+                    const sizeMB = (file.size / 1024 / 1024).toFixed(2);
+                    html += `• ${file.name} (${sizeMB} MB)<br>`;
+                }
+                filesList.innerHTML = html;
+            } else {
+                clearBtn.classList.remove('visible');
+                filesList.innerHTML = '';
+            }
+        }
+
+        function clearAdditionalFiles() {
+            const input = document.getElementById('additionalFiles');
+            const clearBtn = document.getElementById('additionalFilesClear');
+            const filesList = document.getElementById('additionalFilesList');
+            
+            input.value = '';
+            clearBtn.classList.remove('visible');
+            filesList.innerHTML = '';
+        }
+
+
+        
+        function downloadAdditionalFiles() {
+            if (!currentChip || !currentChip.additional_files || currentChip.additional_files.length === 0) {
+                alert('No additional files available');
+                return;
+            }
+            
+            // If only one file, download directly
+            if (currentChip.additional_files.length === 1) {
+                const file = currentChip.additional_files[0];
+                const link = document.createElement('a');
+                link.href = file.url;
+                link.download = file.original_name;
+                link.target = '_blank';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            } else {
+                // Multiple files - create a ZIP
+                downloadAdditionalFilesZip();
+            }
+        }
+
+        async function downloadAdditionalFilesZip() {
+            if (!currentChip || !currentChip.additional_files) return;
+            
+            if (typeof JSZip === 'undefined') {
+                alert('ZIP library not loaded. Please refresh the page and try again.');
+                return;
+            }
+            
+            const zip = new JSZip();
+            const songName = currentChip.name.replace(/[^a-z0-9]/gi, '_').toLowerCase();
+            
+            const select = document.getElementById('downloadSelect');
+            const originalText = select.options[select.selectedIndex].text;
+            select.options[select.selectedIndex].text = 'Creating ZIP...';
+            select.disabled = true;
+            
+            try {
+                for (const file of currentChip.additional_files) {
+                    try {
+                        const response = await fetch(file.url);
+                        if (!response.ok) throw new Error(`Failed to fetch ${file.original_name}`);
+                        
+                        const blob = await response.blob();
+                        zip.file(file.original_name, blob);
+                    } catch (error) {
+                        console.error(`Error adding ${file.original_name}:`, error);
+                    }
+                }
+                
+                select.options[select.selectedIndex].text = 'Generating ZIP...';
+                const content = await zip.generateAsync({ 
+                    type: 'blob',
+                    compression: 'DEFLATE',
+                    compressionOptions: { level: 6 }
+                });
+                
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(content);
+                link.download = `${songName}_additional_files.zip`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                
+                URL.revokeObjectURL(link.href);
+                
+            } catch (error) {
+                console.error('Error creating ZIP:', error);
+                alert('Failed to create ZIP file. Please try again.');
+            } finally {
+                select.options[select.selectedIndex].text = originalText;
+                select.disabled = false;
+                select.value = '';
+            }
+        }
+
 
         function shareTrack() {
             if (!currentChip) return;
@@ -3577,6 +3703,7 @@
             }, 2000);
         }
 
+
         function downloadSelected() {
             const select = document.getElementById('downloadSelect');
             const value = select.value;
@@ -3604,15 +3731,16 @@
                 case '3mf-triple':
                     downloadTriple3MF();
                     break;
+                case 'additional':
+                    downloadAdditionalFiles();
+                    break;
                 case 'all':
                     downloadAll();
-                    return; // Don't reset dropdown yet, downloadAll() will handle it
+                    return;
             }
             
-            // Reset dropdown after download (except for 'all' which handles it internally)
             select.value = '';
         }
-
 
 
         function downloadTriple3MF() {
