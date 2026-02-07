@@ -1168,7 +1168,9 @@
             }
             
             .welcome-message {
-                top: 5px !important;  /* ← ADD: Shifts welcome "i" up */
+                position: relative !important;  /* ← ADD */
+                top: 30px !important;  /* ← ADD !important and adjust value */
+                margin-top: 0 !important;  /* ← ADD to reset any margin */
             }
         }
 
