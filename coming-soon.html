@@ -1139,7 +1139,7 @@
         /* Mobile Landscape */
         @media (max-width: 896px) and (max-height: 430px) and (orientation: landscape) {
             * {
-                zoom: 0.90;
+                zoom: 0.85;
             }
             
             .viewport {
@@ -1153,12 +1153,17 @@
             
             .player-area {
                 top: 77vh !important;
-                padding-top: 120px;  /* ← ADD: Shifts cassette down */
+                padding-top: 40px;  /* Shifts cassette down */
+            }
+            
+            .player-area > div {
+                gap: 10px;  /* ← ADD: Controls space between cassette and welcome message */
             }
             
             .container {
                 max-width: 700px;
                 padding-top: 10px;
+                margin-bottom: 10px;  /* ← ADD: Reduce space below cassette */
             }
             
             .content-box {
@@ -1168,9 +1173,9 @@
             }
             
             .welcome-message {
-                position: relative !important;  /* ← ADD */
-                top: 30px !important;  /* ← ADD !important and adjust value */
-                margin-top: 0 !important;  /* ← ADD to reset any margin */
+                position: relative !important;
+                top: -50px !important;  /* ← NEGATIVE value pulls it UP closer to cassette */
+                margin-top: 0 !important;
             }
         }
 
