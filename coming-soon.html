@@ -886,22 +886,22 @@
                 overflow: visible !important;
             }
 
+
             .scene {
                 transform: translateY(-100vh) !important;
-                position: relative;
+                position: fixed;  /* ← CHANGE to fixed */
+                top: 0;
+                left: 0;
+                right: 0;
                 min-height: 200vh;
                 height: 200vh;
                 overflow: visible;
-                transform-style: preserve-3d;
-                will-change: auto;  /* ← ADD THIS to prevent transform accumulation */
             }
-
+            
             .scene.projects-view {
                 transform: translateY(0) !important;
             }
-
-
-
+            
             .player-area {
                 padding: 0px 40px;
                 height: 100vh;
@@ -910,28 +910,22 @@
                 display: flex;
                 align-items: flex-start;
                 justify-content: center;
-                position: absolute;  /* ← Keep as absolute */
+                position: fixed;  /* ← CHANGE to fixed */
                 top: 100vh;
                 left: 0;
                 right: 0;
                 overflow: visible;
-                transform: none;  /* ← Remove transform completely */
             }
-
+            
             .container {
-                max-width: 100%;
-                width: 100%;
                 max-width: 580px;
+                width: 100%;
                 padding: 0;
                 display: flex;
                 flex-direction: row;
                 align-items: flex-start;
-                max-height: none;
-                min-height: unset;
-                transform: none;  /* ← Remove transform */
-                position: relative;
-                z-index: 100;
-                margin-top: 60px;
+                position: static;  /* ← CHANGE to static */
+                padding-top: 40px;  /* ← Use padding instead of margin */
             }
 
             .tabs-row {
@@ -1053,7 +1047,7 @@
             }
             .nav-arrow.up {
                 position: absolute;
-                top: 15px;
+                top: 5px;
                 left: 50%;
                 transform: translateX(-50%);
                 margin-top: 0;
@@ -1120,7 +1114,7 @@
 
             .welcome-message {
                 position: relative;
-                top: 70px;  /* Gap below cassette */
+                top: 95px;  /* Gap below cassette */
                 left: 0;
                 transform: none;  /* Remove transforms, let flexbox handle it */
                 text-align: center;
