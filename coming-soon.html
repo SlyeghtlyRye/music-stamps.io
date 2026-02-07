@@ -25,6 +25,10 @@
             position: relative;
         }
 
+        .player-area > div {
+            position: relative !important;
+        }
+
         .scene {
             transition: transform 0.8s ease;
             position: relative;
@@ -38,7 +42,7 @@
         /* Add Song Button */
         .add-song-btn {
             position: absolute;
-            top: 0px;
+            top: -150px;
             left: 50%;
             transform: translateX(-50%);
             background: none;
@@ -266,9 +270,6 @@
 
         /* Navigation Arrows */
         .nav-arrow {
-            position: fixed;
-            left: 50%;
-            transform: translateX(-50%);
             font-size: 48px;
             color: #000;
             cursor: pointer;
@@ -279,12 +280,17 @@
         }
 
         .nav-arrow.up {
-            top: 40px;
+            position: relative;
+            margin-bottom: 10px;
             animation: bounceUp 2s infinite;
             z-index: 50;
+            /* Centering handled by parent flex container */
         }
 
         .nav-arrow.down {
+            position: fixed;
+            left: 50%;
+            transform: translateX(-50%);
             bottom: 40px;
             animation: bounceDown 2s infinite;
         }
@@ -296,16 +302,26 @@
 
         .nav-arrow:hover {
             color: #ff0000;
+            animation: none;
+        }
+
+        .nav-arrow.up:hover {
+            transform: scale(1.15);
+            animation: none;
+        }
+
+        .nav-arrow.down:hover {
             transform: translateX(-50%) scale(1.15);
             animation: none;
         }
 
+
         @keyframes bounceUp {
             0%, 100% {
-                transform: translateX(-50%) translateY(0);
+                transform: translateY(0);
             }
             50% {
-                transform: translateX(-50%) translateY(-10px);
+                transform: translateY(-10px);
             }
         }
 
@@ -416,7 +432,7 @@
             align-items: center;
             justify-content: center;
             padding: 0px;
-            transform: translateY(70px);
+            transform: translateY(0);
 
         }
 
@@ -876,7 +892,8 @@
                 min-height: 200vh;
                 height: 200vh;
                 overflow: visible;
-                transform-style: preserve-3d; /* Ensures the flip doesn't flatten */
+                transform-style: preserve-3d;
+                will-change: auto;  /* ← ADD THIS to prevent transform accumulation */
             }
 
             .scene.projects-view {
@@ -893,12 +910,12 @@
                 display: flex;
                 align-items: flex-start;
                 justify-content: center;
-                position: absolute;
+                position: absolute;  /* ← Keep as absolute */
                 top: 100vh;
                 left: 0;
                 right: 0;
                 overflow: visible;
-                transform: translateY(25px);
+                transform: none;  /* ← Remove transform completely */
             }
 
             .container {
@@ -909,13 +926,12 @@
                 display: flex;
                 flex-direction: row;
                 align-items: flex-start;
-
                 max-height: none;
                 min-height: unset;
-                transform: translateY(20px);
-                position: relative; /* ADD THIS */
-                z-index: 100; /* ADD THIS - same or higher than the arrow */
-                
+                transform: none;  /* ← Remove transform */
+                position: relative;
+                z-index: 100;
+                margin-top: 60px;
             }
 
             .tabs-row {
@@ -1035,12 +1051,16 @@
                 font-size: 36px;
                 z-index: 100;
             }
-
             .nav-arrow.up {
-                top: 10px;
+                position: absolute;
+                top: 15px;
+                left: 50%;
+                transform: translateX(-50%);
+                margin-top: 0;
+                margin-bottom: 0;
                 background: rgba(240, 240, 240, 0);
-                z-index: 50; /* CHANGE THIS - higher than container so it's clickable */
-                pointer-events: auto; /* ADD THIS to ensure it's clickable */
+                z-index: 50;
+                pointer-events: auto;
             }
 
             .nav-arrow.down {
@@ -1079,7 +1099,7 @@
 
             .add-song-btn {
                 position: absolute;
-                top: 0x;
+                top: 0px;  /* ← CHANGE from 0px to move it down */
                 left: 50%;
                 transform: translateX(-50%);
                 background: none;
@@ -1094,22 +1114,21 @@
                 pointer-events: none;
                 transition: all 0.3s;
                 z-index: 200;
-                padding-top: 40px;
+                padding-top: 40px;  /* ← You might also want to remove this */
                 line-height: 1;
             }
 
             .welcome-message {
-                font-size: 11px;
-                max-width: 90%;
+                position: relative;
+                top: 70px;  /* Gap below cassette */
+                left: 0;
+                transform: none;  /* Remove transforms, let flexbox handle it */
                 text-align: center;
-                position: fixed;
-                bottom: 10px;
-                left: 50%;
-                transform: translateX(-50%);
-                margin: 0;
-                z-index: 1000;
+                font-size: 14px;
+                color: #333;
+                transition: opacity 0.5s ease;
+                white-space: nowrap;
             }
-
 
 
 
@@ -1535,16 +1554,15 @@
 
 
         .welcome-message {
-            position: absolute;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            text-align: left;
+            margin-top: -175px;  /* Gap below cassette */
+            text-align: center;
             font-size: 14px;
             color: #333;
             transition: opacity 0.5s ease;
             white-space: nowrap;
         }
+
+
 
         .welcome-message.lightbulb {
             font-size: 24px;
@@ -1576,7 +1594,6 @@
 </head>
 <body>
     <div class="viewport">
-        <div class="nav-arrow up" id="upArrow" onclick="panToChips()">↑</div>
         <div class="nav-arrow down" id="downArrow" onclick="panToPlayer()">↓</div>
         <div class="scene" id="scene">
             <!-- Chip Selection Area (Above) -->
@@ -1587,35 +1604,38 @@
 
             <!-- Player Area (Below) -->
             <div class="player-area">
-                <div class="container">
-                    <div class="tabs-row">
-                        <button class="tab active" onclick="switchTab(0)">HOME</button>
-                        <button class="tab" onclick="switchTab(1)">PROJECTS</button>
-                        <button class="tab" onclick="switchTab(2)">ABOUT</button>
-                        <button class="tab" onclick="switchTab(3)">CONTACT</button>
-                    </div>
+                <div style="display: flex; flex-direction: column; align-items: center; width: 100%; max-width: 900px;">
+                    <div class="nav-arrow up" id="upArrow" onclick="panToChips()">↑</div>
                     
-                    <div class="content-box">
-                        <div class="content" id="content">
+                    <div class="container">
+                        <div class="tabs-row">
+                            <button class="tab active" onclick="switchTab(0)">HOME</button>
+                            <button class="tab" onclick="switchTab(1)">PROJECTS</button>
+                            <button class="tab" onclick="switchTab(2)">ABOUT</button>
+                            <button class="tab" onclick="switchTab(3)">CONTACT</button>
                         </div>
                         
-                        <div class="chip-slot" id="chipSlot">
-                            INSERT<br>CHIP
-                        </div>
+                        <div class="content-box">
+                            <div class="content" id="content">
+                            </div>
 
-                        <div class="qr-display" id="qrDisplay">
-                            <h3>QR Code</h3>
-                            <img id="qrImage" src="" alt="QR Code">
-                            <button class="qr-download-btn" onclick="downloadQR()">Download</button>
+                            <div class="chip-slot" id="chipSlot">
+                                INSERT<br>CHIP
+                            </div>
+
+                            <div class="qr-display" id="qrDisplay">
+                                <h3>QR Code</h3>
+                                <img id="qrImage" src="" alt="QR Code">
+                                <button class="qr-download-btn" onclick="downloadQR()">Download</button>
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                <div class="welcome-message" id="welcomeMessage">
-                    Welcome! Click a tab above to navigate.
+                    <div class="welcome-message" id="welcomeMessage">
+                        Welcome! Click a tab above to navigate.
+                    </div>
                 </div>
             </div>
-        </div>
     </div>
 
     <!-- Login Modal -->
