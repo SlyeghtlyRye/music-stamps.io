@@ -1139,7 +1139,7 @@
         /* Mobile Landscape */
         @media (max-width: 896px) and (max-height: 430px) and (orientation: landscape) {
             * {
-                zoom: 0.90;
+                zoom: 0.85;
             }
             
             .viewport {
@@ -1153,6 +1153,7 @@
             
             .player-area {
                 top: 77vh !important;
+                padding-top: 60px;  /* ← ADD: Shifts cassette down */
             }
             
             .container {
@@ -1165,7 +1166,12 @@
                 min-height: 350px !important;
                 max-height: 350px !important;
             }
+            
+            .welcome-message {
+                top: 40px !important;  /* ← ADD: Shifts welcome "i" up */
+            }
         }
+        
             @keyframes fadeInOut {
                 0% {
                     opacity: 0;
