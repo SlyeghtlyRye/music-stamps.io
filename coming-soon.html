@@ -1135,6 +1135,59 @@
                 opacity: 1;
             }
 
+            /* Mobile Landscape */
+            @media (max-width: 896px) and (orientation: landscape) {
+                body {
+                    transform: scale(0.75);
+                    transform-origin: top left;
+                    width: 133.33%; /* Compensate for scale */
+                    height: 133.33%;
+                }
+                
+                .viewport {
+                    height: 133.33vh;
+                }
+                
+                .scene {
+                    min-height: 266.66vh;
+                    height: 266.66vh;
+                }
+                
+                .player-area {
+                    top: 133.33vh;
+                }
+                
+                .container {
+                    padding-top: 20px;
+                }
+                
+                .content-box {
+                    height: 400px !important;
+                    min-height: 400px;
+                    max-height: 400px !important;
+                }
+                
+                .chip-slot {
+                    height: 200px !important;
+                    min-height: 200px !important;
+                }
+                
+                .nav-arrow {
+                    font-size: 28px;
+                }
+                
+                .chip-shelf {
+                    padding: 60px 20px 20px 20px;
+                }
+                
+                .music-chip {
+                    width: 70px;
+                    height: 70px;
+                }
+            }
+
+
+
             @keyframes fadeInOut {
                 0% {
                     opacity: 0;
